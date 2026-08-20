@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Verification - GlobalScholarsHub PK</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ===== VERIFICATION SPECIFIC STYLES ===== */
+        .verification-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            padding: 50px 0;
+            background: #f0f4f8;
+        }
+
+        .verification-box {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 48px 44px;
+            max-width: 620px;
+            width: 100%;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verification-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed, #2563eb);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .verification-icon {
+            width: 80px;
+            height: 80px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .verification-icon i {
+            font-size: 38px;
+            color: #2563eb;
+        }
+
+        .verification-box h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0a1628;
+            margin-bottom: 8px;
+        }
+
+        .verification-box .sub-title {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+
+        .verification-box .sub-title span {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        /* ===== STEPS ===== */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 24px 0 28px;
+            text-align: left;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 20px;
+            border-left: 3px solid #e2e8f0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step-item:last-child {
+            border-left-color: transparent;
+        }
+
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 24px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active::before {
+            background: #2563eb;
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+
+        .step-item.done::before {
+            background: #22c55e;
+            box-shadow: 0 0 0 2px #22c55e;
+        }
+
+        .step-item .step-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            min-width: 28px;
+            padding-top: 2px;
+        }
+
+        .step-item .step-content {
+            flex: 1;
+        }
+
+        .step-item .step-content h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0a1628;
+            margin-bottom: 2px;
+        }
+
+        .step-item .step-content p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .step-item .step-icon {
+            font-size: 18px;
+            color: #94a3b8;
+            min-width: 32px;
+            text-align: center;
+            padding-top: 2px;
+        }
+
+        .step-item.done .step-icon {
+            color: #22c55e;
+        }
+
+        .step-item.active .step-icon {
+            color: #2563eb;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-line {
+            width: 2px;
+            background: #e2e8f0;
+            margin: 0 auto;
+            height: 16px;
+        }
+
+        /* ===== SUCCESS MESSAGE ===== */
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin: 20px 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .success-message i {
+            color: #22c55e;
+            font-size: 20px;
+        }
+
+        .success-message p {
+            font-size: 13px;
+            color: #166534;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .success-message p strong {
+            color: #0a1628;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification-box {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            text-align: left;
+            border: 1px solid #eef2f6;
+        }
+
+        .notification-box i {
+            color: #f59e0b;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .notification-box .notif-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0a1628;
+            margin-bottom: 2px;
+        }
+
+        .notification-box .notif-content p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .notification-box .notif-content p strong {
+            color: #0a1628;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-verify {
+            background: #2563eb;
+            color: #fff;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-verify:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-verify i {
+            font-size: 18px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #2563eb;
+            padding: 14px 32px;
+            border: 2px solid #2563eb;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        /* ===== FOOTER TEXT ===== */
+        .verify-footer-text {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #eef2f6;
+        }
+
+        .verify-footer-text a {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .verify-footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 520px) {
+            .verification-box {
+                padding: 32px 20px;
+            }
+            .verification-box h1 {
+                font-size: 22px;
+            }
+            .step-item {
+                padding: 12px 14px;
+            }
+            .step-item .step-content h4 {
+                font-size: 14px;
+            }
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn-verify, .btn-outline {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+    <img src="images/logo.png" alt="GlobalScholarsHub PK" />
+    <span class="logo-text">GlobalScholarsHub <span>PK</span></span>
+</a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="scholarships.html">Scholarships</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="register.html" class="btn-register">Register</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== VERIFICATION SECTION ===== -->
+    <section class="verification-section">
+        <div class="container">
+            <div class="verification-box">
+
+                <!-- Icon -->
+                <div class="verification-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+
+                <!-- Title -->
+                <h1>Application Submitted! 🎉</h1>
+                <p class="sub-title">
+                    Your profile has been successfully submitted to 
+                    <span>GlobalScholarsHub PK</span>
+                </p>
+
+                <!-- ===== STEPS / TIMELINE ===== -->
+                <div class="steps-container">
+
+                    <!-- Step 1 - Done -->
+                    <div class="step-item done">
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="step-content">
+                            <h4>Step 1: Profile Submitted</h4>
+                            <p>Your personal and academic details have been successfully recorded.</p>
+                        </div>
+                        <div class="step-number">✔</div>
+                    </div>
+
+                    <div class="timeline-line"></div>
+
+                    <!-- Step 2 - Active -->
+                    <div class="step-item active">
+                        <div class="step-icon"><i class="fas fa-clock"></i></div>
+                        <div class="step-content">
+                            <h4>Step 2: Under Review</h4>
+                            <p>Our team is carefully reviewing your application and documents.</p>
+                        </div>
+                        <div class="step-number">02</div>
+                    </div>
+
+                    <div class="timeline-line"></div>
+
+                    <!-- Step 3 - Pending -->
+                    <div class="step-item">
+                        <div class="step-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="step-content">
+                            <h4>Step 3: Notification</h4>
+                            <p>You will receive an email with the next steps and instructions.</p>
+                        </div>
+                        <div class="step-number">03</div>
+                    </div>
+
+                    <div class="timeline-line"></div>
+
+                    <!-- Step 4 - Pending -->
+                    <div class="step-item">
+                        <div class="step-icon"><i class="fas fa-laptop"></i></div>
+                        <div class="step-content">
+                            <h4>Step 4: Online Test</h4>
+                            <p>Shortlisted candidates will be invited for an online assessment.</p>
+                        </div>
+                        <div class="step-number">04</div>
+                    </div>
+
+                </div>
+
+                <!-- ===== SUCCESS MESSAGE ===== -->
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <p>
+                        <strong>We will contact you within 7-10 working days</strong> 
+                        regarding the status of your application.
+                    </p>
+                </div>
+
+                <!-- ===== NOTIFICATION ===== -->
+                <div class="notification-box">
+                    <i class="fas fa-bell"></i>
+                    <div class="notif-content">
+                        <h4>📧 Keep an eye on your inbox</h4>
+                        <p>
+                            We will send you a confirmation email at 
+                            <strong>your registered email address</strong> 
+                            with further instructions about the <strong>online test</strong> 
+                            and scholarship confirmation.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ===== BUTTONS ===== -->
+                <div class="btn-group">
+                    <a href="scholarships.html" class="btn-verify">
+                        <i class="fas fa-arrow-right"></i> Browse Scholarships
+                    </a>
+                    <a href="index.html" class="btn-outline">
+                        <i class="fas fa-home"></i> Go to Home
+                    </a>
+                </div>
+
+                <!-- ===== FOOTER ===== -->
+                <div class="verify-footer-text">
+                    <i class="fas fa-lock" style="margin-right:4px;"></i>
+                    Your information is safe and secure with us.
+                    <br />
+                    <a href="contact.html">Contact Support</a> if you have any questions.
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 GlobalScholarsHub PK. All Rights Reserved. PK</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== NAVBAR SCRIPT =====
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('open');
+            });
+        }
+
+        // ===== ANIMATION ON LOAD =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const steps = document.querySelectorAll('.step-item');
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateX(0)';
+                }, 300 + (index * 200));
+            });
+        });
+
+        // ===== ADD FADE-IN STYLES =====
+        const style = document.createElement('style');
+        style.textContent = `
+            .step-item {
+                opacity: 0;
+                transform: translateX(-20px);
+                transition: opacity 0.5s ease, transform 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body>
+</html>

