@@ -7,7 +7,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== MONGODB CONNECTION =====
-const uri = process.env.MONGODB_URI || 'mongodb+srv://db_username:mQJRALPG3UW4EZxTc@cluster0.zes56bz.mongodb.net/scholarshipDB?appName=Cluster0';
+// Hardcoded URI for testing (Vercel environment variable issue)
+const uri = 'mongodb+srv://db_username:mQJRALPG3UW4EZxTc@cluster0.zes56bz.mongodb.net/scholarshipDB?appName=Cluster0';
+
+console.log('📡 Attempting to connect to MongoDB...');
+console.log('🔗 URI:', uri.replace(/:[^:]*@/, ':****@')); // Hide password in logs
+
 const client = new MongoClient(uri);
 let db;
 let isConnected = false;
@@ -20,15 +25,32 @@ async function connectDB() {
         console.log('✅ MongoDB Connected Successfully!');
     } catch (error) {
         console.error('❌ MongoDB Connection Error:', error.message);
+        console.error('📋 Full Error:', error);
         isConnected = false;
     }
 }
+
+// Connect immediately
 connectDB();
+
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: isConnected ? 'healthy' : 'unhealthy',
+        mongodb: isConnected ? 'connected' : 'disconnected',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // ===== DATA SAVE API =====
 app.post('/api/save-user', async (req, res) => {
     try {
-        if (!isConnected) await connectDB();
+        if (!isConnected) {
+            await connectDB();
+        }
+        if (!isConnected) {
+            return res.json({ success: false, error: 'MongoDB not connected' });
+        }
         
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
@@ -50,22 +72,18 @@ app.post('/api/save-user', async (req, res) => {
 // ===== GET USERS API =====
 app.get('/api/users', async (req, res) => {
     try {
-        if (!isConnected) await connectDB();
+        if (!isConnected) {
+            await connectDB();
+        }
+        if (!isConnected) {
+            return res.json([]);
+        }
         const collection = db.collection('users');
         const users = await collection.find().toArray();
         res.json(users);
     } catch (error) {
         res.json([]);
     }
-});
-
-// ===== HEALTH CHECK =====
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: isConnected ? 'healthy' : 'unhealthy',
-        mongodb: isConnected ? 'connected' : 'disconnected',
-        timestamp: new Date().toISOString()
-    });
 });
 
 // ===== ADMIN PANEL =====
