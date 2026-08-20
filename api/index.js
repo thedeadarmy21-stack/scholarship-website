@@ -4,8 +4,6 @@ const path = require('path');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
-
-// ===== STATIC FILES =====
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== DATA SAVE API =====
@@ -37,15 +35,20 @@ app.post('/api/save-user', (req, res) => {
 app.get('/api/users', (req, res) => {
     try {
         const filePath = path.join(__dirname, '../users-data.json');
+        console.log('📂 Looking for file at:', filePath);
+        
         let users = [];
         try {
             const fileData = fs.readFileSync(filePath, 'utf8');
             users = JSON.parse(fileData);
+            console.log('📤 Sending users:', users.length);
         } catch (err) {
+            console.log('📄 File not found or empty');
             users = [];
         }
         res.json(users);
     } catch (error) {
+        console.error('❌ Error:', error.message);
         res.json([]);
     }
 });
@@ -55,7 +58,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// ===== CATCH ALL - SPA SUPPORT =====
+// ===== CATCH ALL =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
