@@ -7,7 +7,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ============================================================
-// ===== DATA SAVE API =====
+// ===== DATA SAVE API - WITH FORCE CREATE =====
 // ============================================================
 app.post('/api/save-user', (req, res) => {
     try {
@@ -20,14 +20,26 @@ app.post('/api/save-user', (req, res) => {
         const filePath = path.join(__dirname, '../users-data.json');
         console.log('📂 Saving to:', filePath);
         
+        // ===== FORCE CREATE FILE =====
         let allUsers = [];
-        try {
-            const fileData = fs.readFileSync(filePath, 'utf8');
-            allUsers = JSON.parse(fileData);
-            console.log('📄 Existing users:', allUsers.length);
-        } catch (err) {
-            console.log('📄 No existing file, creating new');
-            allUsers = [];
+        
+        // Check if file exists
+        if (fs.existsSync(filePath)) {
+            try {
+                const fileData = fs.readFileSync(filePath, 'utf8');
+                allUsers = JSON.parse(fileData);
+                console.log('📄 Existing users:', allUsers.length);
+            } catch (err) {
+                console.log('📄 File corrupted, starting fresh');
+                allUsers = [];
+            }
+        } else {
+            console.log('📄 File does not exist, will create new');
+            // ===== CREATE DIRECTORY IF NOT EXISTS =====
+            const dir = path.dirname(filePath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
         }
         
         allUsers.push(userData);
@@ -75,7 +87,7 @@ app.get('/api/users', (req, res) => {
 });
 
 // ============================================================
-// ===== DIAGNOSTIC API - REAL PROBLEM BATAYEGA =====
+// ===== DIAGNOSTIC API =====
 // ============================================================
 app.get('/api/debug', (req, res) => {
     try {
@@ -94,7 +106,6 @@ app.get('/api/debug', (req, res) => {
             platform: process.platform
         };
         
-        // Agar file exist karti hai toh content bhi dikhayein
         if (fs.existsSync(filePath)) {
             try {
                 const content = fs.readFileSync(filePath, 'utf8');
@@ -106,7 +117,6 @@ app.get('/api/debug', (req, res) => {
             }
         }
         
-        // Directory mein files list karein
         try {
             const files = fs.readdirSync(dirPath);
             result.filesInDirectory = files.filter(f => f.endsWith('.json'));
@@ -116,27 +126,7 @@ app.get('/api/debug', (req, res) => {
         
         res.json(result);
     } catch (error) {
-        res.json({ 
-            error: error.message, 
-            stack: error.stack 
-        });
-    }
-});
-
-// ============================================================
-// ===== CLEAR DATA API (Testing Ke Liye) =====
-// ============================================================
-app.delete('/api/clear-data', (req, res) => {
-    try {
-        const filePath = path.join(__dirname, '../users-data.json');
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-            res.json({ success: true, message: 'Data cleared successfully!' });
-        } else {
-            res.json({ success: true, message: 'No data file found.' });
-        }
-    } catch (error) {
-        res.json({ success: false, error: error.message });
+        res.json({ error: error.message, stack: error.stack });
     }
 });
 
