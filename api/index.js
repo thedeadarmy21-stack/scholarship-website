@@ -8,7 +8,7 @@ app.use(express.json({ limit: '50mb' }));
 // ===== STATIC FILES =====
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ===== DATA SAVE KARNE KA API =====
+// ===== DATA SAVE API =====
 app.post('/api/save-user', (req, res) => {
     try {
         const userData = req.body;
@@ -27,13 +27,13 @@ app.post('/api/save-user', (req, res) => {
         allUsers.push(userData);
         fs.writeFileSync(filePath, JSON.stringify(allUsers, null, 2));
         
-        res.json({ success: true, totalUsers: allUsers.length, message: 'Data saved!' });
+        res.json({ success: true, totalUsers: allUsers.length });
     } catch (error) {
         res.json({ success: false, error: error.message });
     }
 });
 
-// ===== SAB USERS DEKHNE KA API =====
+// ===== GET USERS API =====
 app.get('/api/users', (req, res) => {
     try {
         const filePath = path.join(__dirname, '../users-data.json');
@@ -55,7 +55,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// ===== DEFAULT ROUTE =====
+// ===== CATCH ALL - SPA SUPPORT =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
