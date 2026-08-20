@@ -1,6 +1,7 @@
 {
   "name": "scholarship-website",
   "version": "1.0.0",
+  "description": "GlobalScholarsHub PK - Scholarship Website",
   "main": "api/index.js",
   "scripts": {
     "start": "node server.js",
