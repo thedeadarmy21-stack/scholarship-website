@@ -1,161 +1,81 @@
 const express = require('express');
-const fs = require('fs');
+const { MongoClient } = require('mongodb');
 const path = require('path');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ============================================================
-// ===== DATA SAVE API - WITH FORCE CREATE =====
-// ============================================================
-app.post('/api/save-user', (req, res) => {
+// ===== MONGODB CONNECTION =====
+const uri = process.env.MONGODB_URI || 'mongodb+srv://db_username:mQJRALPG3UW4EZxTc@cluster0.zes56bz.mongodb.net/scholarshipDB?appName=Cluster0';
+const client = new MongoClient(uri);
+let db;
+let isConnected = false;
+
+async function connectDB() {
     try {
-        console.log('📥 Data received:', req.body);
+        await client.connect();
+        db = client.db('scholarshipDB');
+        isConnected = true;
+        console.log('✅ MongoDB Connected Successfully!');
+    } catch (error) {
+        console.error('❌ MongoDB Connection Error:', error.message);
+        isConnected = false;
+    }
+}
+connectDB();
+
+// ===== DATA SAVE API =====
+app.post('/api/save-user', async (req, res) => {
+    try {
+        if (!isConnected) await connectDB();
         
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
         userData.id = Date.now();
         
-        const filePath = path.join(__dirname, '../users-data.json');
-        console.log('📂 Saving to:', filePath);
+        const collection = db.collection('users');
+        await collection.insertOne(userData);
         
-        // ===== FORCE CREATE FILE =====
-        let allUsers = [];
+        const totalUsers = await collection.countDocuments();
+        console.log('✅ Data saved! Total users:', totalUsers);
         
-        // Check if file exists
-        if (fs.existsSync(filePath)) {
-            try {
-                const fileData = fs.readFileSync(filePath, 'utf8');
-                allUsers = JSON.parse(fileData);
-                console.log('📄 Existing users:', allUsers.length);
-            } catch (err) {
-                console.log('📄 File corrupted, starting fresh');
-                allUsers = [];
-            }
-        } else {
-            console.log('📄 File does not exist, will create new');
-            // ===== CREATE DIRECTORY IF NOT EXISTS =====
-            const dir = path.dirname(filePath);
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-            }
-        }
-        
-        allUsers.push(userData);
-        fs.writeFileSync(filePath, JSON.stringify(allUsers, null, 2));
-        console.log('✅ Data saved! Total users:', allUsers.length);
-        
-        res.json({ 
-            success: true, 
-            totalUsers: allUsers.length, 
-            message: 'Data saved successfully!',
-            savedData: userData
-        });
+        res.json({ success: true, totalUsers: totalUsers });
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
-        res.json({ 
-            success: false, 
-            error: error.message,
-            stack: error.stack
-        });
+        res.json({ success: false, error: error.message });
     }
 });
 
-// ============================================================
 // ===== GET USERS API =====
-// ============================================================
-app.get('/api/users', (req, res) => {
+app.get('/api/users', async (req, res) => {
     try {
-        const filePath = path.join(__dirname, '../users-data.json');
-        console.log('📂 Reading from:', filePath);
-        
-        let users = [];
-        try {
-            const fileData = fs.readFileSync(filePath, 'utf8');
-            users = JSON.parse(fileData);
-            console.log('📤 Sending users:', users.length);
-        } catch (err) {
-            console.log('📄 File not found or empty');
-            users = [];
-        }
+        if (!isConnected) await connectDB();
+        const collection = db.collection('users');
+        const users = await collection.find().toArray();
         res.json(users);
     } catch (error) {
-        console.error('❌ Error reading users:', error.message);
         res.json([]);
     }
 });
 
-// ============================================================
-// ===== DIAGNOSTIC API =====
-// ============================================================
-app.get('/api/debug', (req, res) => {
-    try {
-        const filePath = path.join(__dirname, '../users-data.json');
-        const dirPath = path.dirname(filePath);
-        
-        const result = {
-            timestamp: new Date().toISOString(),
-            filePath: filePath,
-            dirPath: dirPath,
-            fileExists: fs.existsSync(filePath),
-            directoryExists: fs.existsSync(dirPath),
-            cwd: process.cwd(),
-            __dirname: __dirname,
-            nodeVersion: process.version,
-            platform: process.platform
-        };
-        
-        if (fs.existsSync(filePath)) {
-            try {
-                const content = fs.readFileSync(filePath, 'utf8');
-                result.content = JSON.parse(content);
-                result.contentLength = content.length;
-                result.fileSizeKB = (content.length / 1024).toFixed(2);
-            } catch (readError) {
-                result.readError = readError.message;
-            }
-        }
-        
-        try {
-            const files = fs.readdirSync(dirPath);
-            result.filesInDirectory = files.filter(f => f.endsWith('.json'));
-        } catch (dirError) {
-            result.dirError = dirError.message;
-        }
-        
-        res.json(result);
-    } catch (error) {
-        res.json({ error: error.message, stack: error.stack });
-    }
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: isConnected ? 'healthy' : 'unhealthy',
+        mongodb: isConnected ? 'connected' : 'disconnected',
+        timestamp: new Date().toISOString()
+    });
 });
 
-// ============================================================
 // ===== ADMIN PANEL =====
-// ============================================================
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// ============================================================
-// ===== HEALTH CHECK =====
-// ============================================================
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime()
-    });
-});
-
-// ============================================================
-// ===== CATCH ALL - SPA SUPPORT =====
-// ============================================================
+// ===== CATCH ALL =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// ============================================================
-// ===== EXPORT FOR VERCEL =====
-// ============================================================
 module.exports = app;
