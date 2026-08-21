@@ -32,11 +32,21 @@ app.get('/api/health', (req, res) => {
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
-        userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
+        console.log('📥 Received data:', userData);
+        
+        // ===== Column mapping with submitted_at =====
+        const insertData = {
+            name: userData.name || '',
+            email: userData.email || '',
+            password: userData.password || '',
+            submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+        };
+        
+        console.log('📤 Inserting:', insertData);
 
         const { data, error } = await supabase
             .from('users')
-            .insert([userData])
+            .insert([insertData])
             .select();
 
         if (error) {
