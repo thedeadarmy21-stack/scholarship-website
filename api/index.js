@@ -19,6 +19,15 @@ console.log('📡 Supabase Key:', supabaseKey ? 'Set ✅' : 'Missing ❌');
 // ===== Client Initialize Karein =====
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        supabase: supabaseUrl ? 'configured' : 'missing',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // ===== DATA SAVE API =====
 app.post('/api/save-user', async (req, res) => {
     try {
@@ -61,15 +70,6 @@ app.get('/api/users', async (req, res) => {
         console.error('❌ Error fetching users:', error);
         res.json([]);
     }
-});
-
-// ===== HEALTH CHECK =====
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'healthy',
-        supabase: supabaseUrl ? 'configured' : 'missing',
-        timestamp: new Date().toISOString()
-    });
 });
 
 // ===== ADMIN PANEL =====
