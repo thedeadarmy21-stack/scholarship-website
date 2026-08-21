@@ -1,6 +1,8 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
+
+// ===== IMPORTANT: .env config load karein =====
 require('dotenv').config();
 
 const app = express();
@@ -11,10 +13,10 @@ app.use(express.static(path.join(__dirname, '../public')));
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Supabase credentials missing!');
-}
+console.log('📡 Supabase URL:', supabaseUrl ? 'Set ✅' : 'Missing ❌');
+console.log('📡 Supabase Key:', supabaseKey ? 'Set ✅' : 'Missing ❌');
 
+// ===== Client Initialize Karein =====
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ===== DATA SAVE API =====
@@ -56,8 +58,18 @@ app.get('/api/users', async (req, res) => {
 
         res.json(data);
     } catch (error) {
+        console.error('❌ Error fetching users:', error);
         res.json([]);
     }
+});
+
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        supabase: supabaseUrl ? 'configured' : 'missing',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // ===== ADMIN PANEL =====
