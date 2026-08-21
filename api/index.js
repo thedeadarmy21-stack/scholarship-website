@@ -1,43 +1,28 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ===== MONGODB CONNECTION =====
-// Hardcoded URI for testing (Vercel environment variable issue)
-const uri = 'mongodb+srv://db_username:mQJRALPG3UW4EZxTc@cluster0.zes56bz.mongodb.net/scholarshipDB?appName=Cluster0';
+// ===== SUPABASE CONNECTION =====
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-console.log('📡 Attempting to connect to MongoDB...');
-console.log('🔗 URI:', uri.replace(/:[^:]*@/, ':****@')); // Hide password in logs
-
-const client = new MongoClient(uri);
-let db;
-let isConnected = false;
-
-async function connectDB() {
-    try {
-        await client.connect();
-        db = client.db('scholarshipDB');
-        isConnected = true;
-        console.log('✅ MongoDB Connected Successfully!');
-    } catch (error) {
-        console.error('❌ MongoDB Connection Error:', error.message);
-        console.error('📋 Full Error:', error);
-        isConnected = false;
-    }
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ Supabase credentials missing! Check .env file');
 }
 
-// Connect immediately
-connectDB();
+const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('✅ Supabase client initialized');
 
 // ===== HEALTH CHECK =====
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: isConnected ? 'healthy' : 'unhealthy',
-        mongodb: isConnected ? 'connected' : 'disconnected',
+    res.json({
+        status: 'healthy',
+        supabase: supabaseUrl ? 'connected' : 'disconnected',
         timestamp: new Date().toISOString()
     });
 });
@@ -45,24 +30,22 @@ app.get('/api/health', (req, res) => {
 // ===== DATA SAVE API =====
 app.post('/api/save-user', async (req, res) => {
     try {
-        if (!isConnected) {
-            await connectDB();
-        }
-        if (!isConnected) {
-            return res.json({ success: false, error: 'MongoDB not connected' });
-        }
-        
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
         userData.id = Date.now();
-        
-        const collection = db.collection('users');
-        await collection.insertOne(userData);
-        
-        const totalUsers = await collection.countDocuments();
-        console.log('✅ Data saved! Total users:', totalUsers);
-        
-        res.json({ success: true, totalUsers: totalUsers });
+
+        const { data, error } = await supabase
+            .from('users')
+            .insert([userData])
+            .select();
+
+        if (error) {
+            console.error('❌ Supabase Error:', error);
+            return res.json({ success: false, error: error.message });
+        }
+
+        console.log('✅ Data saved!', data);
+        res.json({ success: true, data: data });
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
         res.json({ success: false, error: error.message });
@@ -72,15 +55,17 @@ app.post('/api/save-user', async (req, res) => {
 // ===== GET USERS API =====
 app.get('/api/users', async (req, res) => {
     try {
-        if (!isConnected) {
-            await connectDB();
-        }
-        if (!isConnected) {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('❌ Supabase Error:', error);
             return res.json([]);
         }
-        const collection = db.collection('users');
-        const users = await collection.find().toArray();
-        res.json(users);
+
+        res.json(data);
     } catch (error) {
         res.json([]);
     }
