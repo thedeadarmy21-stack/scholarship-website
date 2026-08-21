@@ -6,8 +6,6 @@
     <title>Register - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -113,7 +111,7 @@
 
     <script src="js/script.js"></script>
 
-    <!-- ===== REGISTER FORM SUBMIT ===== -->
+    <!-- ===== REGISTER FORM SUBMIT - API CALL ===== -->
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -123,6 +121,8 @@
             const password = document.getElementById('password').value;
             
             try {
+                console.log('📤 Sending data:', { name, email, password });
+                
                 const response = await fetch('/api/save-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -130,7 +130,7 @@
                 });
                 
                 const result = await response.json();
-                console.log('✅ Data saved:', result);
+                console.log('✅ Response:', result);
                 
                 if (result.success) {
                     alert('✅ Registration successful!');
