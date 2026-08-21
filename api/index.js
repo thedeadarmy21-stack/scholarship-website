@@ -12,27 +12,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Supabase credentials missing! Check .env file');
+    console.error('❌ Supabase credentials missing!');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
-console.log('✅ Supabase client initialized');
-
-// ===== HEALTH CHECK =====
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'healthy',
-        supabase: supabaseUrl ? 'connected' : 'disconnected',
-        timestamp: new Date().toISOString()
-    });
-});
 
 // ===== DATA SAVE API =====
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
-        userData.id = Date.now();
 
         const { data, error } = await supabase
             .from('users')
@@ -41,14 +30,14 @@ app.post('/api/save-user', async (req, res) => {
 
         if (error) {
             console.error('❌ Supabase Error:', error);
-            return res.json({ success: false, error: error.message });
+            return res.status(400).json({ success: false, error: error.message });
         }
 
         console.log('✅ Data saved!', data);
         res.json({ success: true, data: data });
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
-        res.json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
