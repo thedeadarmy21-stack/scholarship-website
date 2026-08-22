@@ -537,7 +537,6 @@
         <div class="container">
             <div class="profile-box">
 
-                <!-- Header -->
                 <div class="profile-header">
                     <div class="profile-icon">
                         <i class="fas fa-user-circle"></i>
@@ -546,7 +545,6 @@
                     <p>Provide your details to apply for scholarships</p>
                 </div>
 
-                <!-- Progress Steps -->
                 <div class="progress-steps">
                     <span class="step-dot done"></span>
                     <span class="step-line done"></span>
@@ -557,7 +555,6 @@
                     <span class="step-dot"></span>
                 </div>
 
-                <!-- Profile Form -->
                 <form class="profile-form" id="profileForm">
 
                     <!-- Image Upload -->
@@ -631,7 +628,7 @@
                         </div>
                     </div>
 
-                    <!-- ===== CNIC SECTION ===== -->
+                    <!-- CNIC SECTION -->
                     <div class="form-group full-width">
                         <div class="cnic-section">
                             <div class="cnic-title">
@@ -679,7 +676,7 @@
                         </div>
                     </div>
 
-                    <!-- ===== DOCUMENT UPLOAD SECTION ===== -->
+                    <!-- DOCUMENT UPLOAD SECTION -->
                     <div class="form-group full-width">
                         <div class="document-section">
                             <div class="doc-title">
@@ -796,7 +793,6 @@
 
     <script src="js/script.js"></script>
 
-    <!-- ===== COMPLETE PROFILE JAVASCRIPT - WITH DOCUMENTS BASE64 ===== -->
     <script>
         // ===== VARIABLES =====
         let profileImageBase64 = '';
@@ -827,7 +823,6 @@
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
-                        // Save base64 with filename
                         const docData = {
                             name: file.name,
                             type: file.type,
@@ -868,10 +863,9 @@
         });
 
         // ===== FORM SUBMIT =====
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get CNIC
             const ownCnic = document.getElementById('ownCnicInput').value.trim();
             const fatherCnic = document.getElementById('fatherCnicInput').value.trim();
             
@@ -880,13 +874,11 @@
                 return;
             }
 
-            // Check documents
             if (docBase64List.length === 0) {
                 alert('⚠️ Please upload at least one document (Marksheet, Result, Certificate, etc.) to continue.');
                 return;
             }
 
-            // ===== COLLECT ALL DATA =====
             const profileData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -906,7 +898,7 @@
                 about: document.getElementById('about').value,
                 skills: document.getElementById('skills').value,
                 profileImage: profileImageBase64,
-                documents: docBase64List,  // Full documents with data
+                documents: docBase64List,
                 documentsCount: docBase64List.length,
                 profileCompleted: true,
                 profileCompletedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
@@ -914,20 +906,19 @@
 
             console.log('📤 Sending profile data with ' + docBase64List.length + ' documents');
 
-            try {
-                const response = await fetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(profileData)
-                });
-                const result = await response.json();
-                console.log('✅ Profile data saved:', result);
-                alert('✅ Profile completed successfully!');
-                window.location.href = 'verification.html';
-            } catch (error) {
-                console.log('⚠️ Error saving profile data:', error);
-                alert('⚠️ Error saving data. Make sure server is running (node server.js)');
+            // ===== SAVE TO LOCAL STORAGE =====
+            let allUsers = [];
+            const saved = localStorage.getItem('allUsersData');
+            if (saved) {
+                allUsers = JSON.parse(saved);
             }
+            
+            allUsers.push(profileData);
+            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+            console.log('✅ Profile data saved to Local Storage! Total users:', allUsers.length);
+
+            alert('✅ Profile completed successfully! Redirecting to Scholarships...');
+            window.location.href = 'scholarships.html';
         });
     </script>
 

