@@ -6,6 +6,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== VERCEL BLOB STORAGE =====
+// Note: @vercel/blob package must be installed
 const { put, head } = require('@vercel/blob');
 const BLOB_KEY = 'users-data.json';
 
@@ -14,7 +15,8 @@ async function readUsers() {
         const { url } = await head(BLOB_KEY);
         const response = await fetch(url);
         return await response.json();
-    } catch {
+    } catch (error) {
+        console.log('📂 No existing blob, starting fresh');
         return [];
     }
 }
@@ -30,7 +32,11 @@ async function writeUsers(users) {
 
 // ===== API ROUTES =====
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'healthy', storage: 'Vercel Blob', timestamp: new Date().toISOString() });
+    res.json({ 
+        status: 'healthy', 
+        storage: 'Vercel Blob',
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.post('/api/save-user', async (req, res) => {
@@ -39,6 +45,8 @@ app.post('/api/save-user', async (req, res) => {
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
         userData.id = Date.now();
 
+        console.log('📥 Received data:', userData);
+
         let users = await readUsers();
         users.push(userData);
         await writeUsers(users);
@@ -46,8 +54,12 @@ app.post('/api/save-user', async (req, res) => {
         console.log('✅ Data saved! Total:', users.length);
         res.json({ success: true, totalUsers: users.length });
     } catch (error) {
-        console.error('❌ Error:', error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('❌ Error:', error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            details: error.stack 
+        });
     }
 });
 
@@ -55,7 +67,8 @@ app.get('/api/users', async (req, res) => {
     try {
         const users = await readUsers();
         res.json(users);
-    } catch {
+    } catch (error) {
+        console.error('❌ Error reading users:', error.message);
         res.json([]);
     }
 });
