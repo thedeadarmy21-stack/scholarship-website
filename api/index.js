@@ -1,5 +1,5 @@
 const express = require('express');
-const { put, head, del } = require('@vercel/blob');
+const { put, head } = require('@vercel/blob');
 const path = require('path');
 
 const app = express();
@@ -12,21 +12,31 @@ const BLOB_KEY = 'users-data.json';
 // ===== READ DATA FROM BLOB =====
 async function readUsersFromBlob() {
     try {
+        console.log('📂 Reading from blob...');
+        console.log('📂 BLOB_KEY:', BLOB_KEY);
         const { url } = await head(BLOB_KEY);
+        console.log('📂 Blob URL:', url);
         const response = await fetch(url);
-        return await response.json();
+        const data = await response.json();
+        console.log('📂 Users found:', data.length);
+        return data;
     } catch (error) {
+        console.log('📂 No existing blob, returning empty array');
+        console.log('📂 Error:', error.message);
         return [];
     }
 }
 
 // ===== WRITE DATA TO BLOB =====
 async function writeUsersToBlob(users) {
+    console.log('📤 Writing to blob...');
+    console.log('📤 Users count:', users.length);
     const blob = await put(BLOB_KEY, JSON.stringify(users, null, 2), {
         access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false,
     });
+    console.log('📤 Blob URL:', blob.url);
     return blob.url;
 }
 
@@ -42,6 +52,8 @@ app.get('/api/health', (req, res) => {
 // ===== DATA SAVE API =====
 app.post('/api/save-user', async (req, res) => {
     try {
+        console.log('📥 Received data:', req.body);
+        
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
         userData.id = Date.now();
@@ -57,7 +69,8 @@ app.post('/api/save-user', async (req, res) => {
         res.json({ success: true, totalUsers: users.length, url: url });
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('❌ Full error:', error);
+        res.status(500).json({ success: false, error: error.message, stack: error.stack });
     }
 });
 
@@ -65,8 +78,10 @@ app.post('/api/save-user', async (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         const users = await readUsersFromBlob();
+        console.log('📤 Sending users:', users.length);
         res.json(users);
     } catch (error) {
+        console.error('❌ Error reading users:', error.message);
         res.json([]);
     }
 });
