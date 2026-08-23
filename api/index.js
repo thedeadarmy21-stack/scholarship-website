@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ===== VERCEL BLOB STORAGE (PUBLIC) =====
+// ===== VERCEL BLOB STORAGE =====
 const { put, head } = require('@vercel/blob');
 const BLOB_KEY = 'users-data.json';
 
@@ -31,7 +31,11 @@ async function writeUsers(users) {
     return blob.url;
 }
 
+// ============================================================
 // ===== API ROUTES =====
+// ============================================================
+
+// ===== HEALTH CHECK =====
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'healthy',
@@ -40,6 +44,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// ===== SAVE USER DATA =====
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
@@ -63,6 +68,7 @@ app.post('/api/save-user', async (req, res) => {
     }
 });
 
+// ===== GET ALL USERS =====
 app.get('/api/users', async (req, res) => {
     try {
         const users = await readUsers();
@@ -73,12 +79,34 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+// ===== CLEAR ALL DATA =====
+app.delete('/api/clear-data', async (req, res) => {
+    try {
+        await writeUsers([]);
+        console.log('🗑️ All data cleared!');
+        res.json({ success: true, message: 'All data cleared!' });
+    } catch (error) {
+        console.error('❌ Error clearing data:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================
+// ===== FRONTEND ROUTES =====
+// ============================================================
+
+// ===== ADMIN PANEL =====
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
+// ===== CATCH ALL - SPA SUPPORT =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
+
+// ============================================================
+// ===== EXPORT FOR VERCEL =====
+// ============================================================
 
 module.exports = app;
