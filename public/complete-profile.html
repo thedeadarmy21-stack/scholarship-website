@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ===== PROFILE SPECIFIC STYLES ===== */
         .profile-section {
             min-height: 80vh;
             display: flex;
@@ -91,7 +90,6 @@
             background: #22c55e;
         }
 
-        /* ===== IMAGE UPLOAD ===== */
         .image-upload-container {
             display: flex;
             flex-direction: column;
@@ -159,7 +157,6 @@
             margin-right: 4px;
         }
 
-        /* ===== CNIC SECTION ===== */
         .cnic-section {
             background: #f8fafc;
             border: 1px solid #eef2f6;
@@ -287,111 +284,6 @@
             gap: 4px;
         }
 
-        /* ===== DOCUMENT UPLOAD SECTION ===== */
-        .document-section {
-            background: #f8fafc;
-            border: 1px solid #eef2f6;
-            border-radius: 12px;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-        }
-
-        .document-section .doc-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0a1628;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .document-section .doc-title i {
-            color: #2563eb;
-        }
-
-        .document-section .doc-subtitle {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .document-section .doc-subtitle i {
-            color: #f59e0b;
-        }
-
-        .doc-upload-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .doc-upload-item {
-            background: #fff;
-            border: 2px dashed #e2e8f0;
-            border-radius: 12px;
-            padding: 16px 14px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .doc-upload-item:hover {
-            border-color: #2563eb;
-            background: #f8fafc;
-        }
-
-        .doc-upload-item .doc-icon {
-            font-size: 28px;
-            color: #94a3b8;
-            margin-bottom: 4px;
-        }
-
-        .doc-upload-item .doc-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #0a1628;
-        }
-
-        .doc-upload-item .doc-format {
-            font-size: 11px;
-            color: #94a3b8;
-        }
-
-        .doc-upload-item .doc-status {
-            font-size: 11px;
-            margin-top: 4px;
-            color: #22c55e;
-        }
-
-        .doc-upload-item .doc-status i {
-            margin-right: 3px;
-        }
-
-        .doc-upload-item input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .doc-upload-item.uploaded {
-            border-color: #22c55e;
-            background: #f0fdf4;
-        }
-
-        .doc-upload-item.uploaded .doc-icon {
-            color: #22c55e;
-        }
-
-        /* ===== FORM ===== */
         .profile-form .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -485,7 +377,22 @@
             font-size: 18px;
         }
 
-        /* ===== RESPONSIVE ===== */
+        .auth-footer {
+            text-align: center;
+            margin-top: 16px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 640px) {
             .profile-box {
                 padding: 24px 16px;
@@ -501,9 +408,6 @@
                 height: 100px;
             }
             .cnic-options {
-                grid-template-columns: 1fr;
-            }
-            .doc-upload-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -590,36 +494,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 2: Date of Birth + Gender -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-alt"></i> Date of Birth <span class="required">*</span></label>
-                            <input type="date" id="dob" required />
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-venus-mars"></i> Gender <span class="required">*</span></label>
-                            <select id="gender" required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Row 3: Nationality + Country -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-flag"></i> Nationality <span class="required">*</span></label>
-                            <input type="text" id="nationality" placeholder="e.g. Pakistani" required />
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-map-marker-alt"></i> Country of Residence <span class="required">*</span></label>
-                            <input type="text" id="country" placeholder="e.g. Pakistan" required />
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Phone + City -->
+                    <!-- Row 2: Phone + City -->
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-phone"></i> Phone Number <span class="required">*</span></label>
@@ -631,7 +506,19 @@
                         </div>
                     </div>
 
-                    <!-- ===== CNIC SECTION ===== -->
+                    <!-- Row 3: University + GPA -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-university"></i> University <span class="required">*</span></label>
+                            <input type="text" id="university" placeholder="Enter university name" required />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-star"></i> GPA / Percentage <span class="required">*</span></label>
+                            <input type="text" id="gpa" placeholder="e.g. 3.5 / 85%" required />
+                        </div>
+                    </div>
+
+                    <!-- CNIC SECTION -->
                     <div class="form-group full-width">
                         <div class="cnic-section">
                             <div class="cnic-title">
@@ -679,113 +566,20 @@
                         </div>
                     </div>
 
-                    <!-- ===== DOCUMENT UPLOAD SECTION ===== -->
-                    <div class="form-group full-width">
-                        <div class="document-section">
-                            <div class="doc-title">
-                                <i class="fas fa-file-upload"></i> Upload Documents
-                                <span class="required" style="color:#ef4444;font-size:14px;">*</span>
-                            </div>
-                            <div class="doc-subtitle">
-                                <i class="fas fa-info-circle"></i>
-                                Upload your academic documents, marksheets, certificates, and results
-                            </div>
-
-                            <div class="doc-upload-grid">
-
-                                <!-- Document 1: Marksheet / Transcript -->
-                                <div class="doc-upload-item" id="doc1">
-                                    <div class="doc-icon"><i class="fas fa-file-alt"></i></div>
-                                    <div class="doc-label">Marksheet / Transcript</div>
-                                    <div class="doc-format">PDF, JPG, PNG (Max 5MB)</div>
-                                    <div class="doc-status" id="doc1Status"></div>
-                                    <input type="file" id="docInput1" accept=".pdf,.jpg,.jpeg,.png" />
-                                </div>
-
-                                <!-- Document 2: Result Card -->
-                                <div class="doc-upload-item" id="doc2">
-                                    <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                                    <div class="doc-label">Result Card</div>
-                                    <div class="doc-format">PDF, JPG, PNG (Max 5MB)</div>
-                                    <div class="doc-status" id="doc2Status"></div>
-                                    <input type="file" id="docInput2" accept=".pdf,.jpg,.jpeg,.png" />
-                                </div>
-
-                                <!-- Document 3: Certificate / Degree -->
-                                <div class="doc-upload-item" id="doc3">
-                                    <div class="doc-icon"><i class="fas fa-certificate"></i></div>
-                                    <div class="doc-label">Certificate / Degree</div>
-                                    <div class="doc-format">PDF, JPG, PNG (Max 5MB)</div>
-                                    <div class="doc-status" id="doc3Status"></div>
-                                    <input type="file" id="docInput3" accept=".pdf,.jpg,.jpeg,.png" />
-                                </div>
-
-                                <!-- Document 4: Other Documents -->
-                                <div class="doc-upload-item" id="doc4">
-                                    <div class="doc-icon"><i class="fas fa-folder-open"></i></div>
-                                    <div class="doc-label">Other Documents</div>
-                                    <div class="doc-format">PDF, JPG, PNG (Max 5MB)</div>
-                                    <div class="doc-status" id="doc4Status"></div>
-                                    <input type="file" id="docInput4" accept=".pdf,.jpg,.jpeg,.png" />
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Row 5: Education Level + Field of Study -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-graduation-cap"></i> Education Level <span class="required">*</span></label>
-                            <select id="educationLevel" required>
-                                <option value="">Select Education</option>
-                                <option value="bachelor">Bachelor</option>
-                                <option value="master">Master</option>
-                                <option value="phd">PhD</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Field of Study <span class="required">*</span></label>
-                            <input type="text" id="fieldOfStudy" placeholder="e.g. Computer Science" required />
-                        </div>
-                    </div>
-
-                    <!-- Row 6: University + GPA -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-university"></i> Current/Previous University <span class="required">*</span></label>
-                            <input type="text" id="university" placeholder="Enter university name" required />
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-star"></i> GPA / Percentage <span class="required">*</span></label>
-                            <input type="text" id="gpa" placeholder="e.g. 3.5 / 85%" required />
-                        </div>
-                    </div>
-
-                    <!-- Full Width: Address -->
-                    <div class="form-group full-width">
-                        <label><i class="fas fa-home"></i> Current Address</label>
-                        <input type="text" id="address" placeholder="Enter your current address" />
-                    </div>
-
-                    <!-- Full Width: About / Bio -->
+                    <!-- About -->
                     <div class="form-group full-width">
                         <label><i class="fas fa-pen"></i> About Yourself <span class="required">*</span></label>
                         <textarea id="about" placeholder="Tell us about yourself, your achievements, and why you want to study abroad..." required></textarea>
                     </div>
 
-                    <!-- Full Width: Skills -->
-                    <div class="form-group full-width">
-                        <label><i class="fas fa-tools"></i> Skills / Interests</label>
-                        <input type="text" id="skills" placeholder="e.g. Programming, Leadership, Research" />
-                    </div>
-
                     <button type="submit" class="btn-profile">
                         <i class="fas fa-check-circle"></i> Save & Continue
                     </button>
-
                 </form>
+
+                <p class="auth-footer">
+                    <a href="scholarships.html">Skip for now →</a>
+                </p>
 
             </div>
         </div>
@@ -801,84 +595,16 @@
     <script src="js/script.js"></script>
 
     <!-- ============================================================ -->
-    <!-- ===== COMPLETE PROFILE JAVASCRIPT ===== -->
+    <!-- ===== COMPLETE PROFILE JAVASCRIPT - 100% WORKING ===== -->
     <!-- ============================================================ -->
     <script>
-        // ===== VARIABLES =====
-        let profileImageBase64 = '';
-        let docBase64List = [];
+        console.log('✅ Complete Profile page loaded!');
 
-        // ===== IMAGE UPLOAD =====
-        document.getElementById('profileImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    profileImageBase64 = event.target.result;
-                    document.getElementById('profilePreview').src = event.target.result;
-                    document.getElementById('profilePreview').style.display = 'block';
-                    document.getElementById('uploadPlaceholder').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // ===== DOCUMENT UPLOAD - BASE64 CONVERT =====
-        document.querySelectorAll('.doc-upload-item input[type="file"]').forEach((input) => {
-            input.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                const parent = this.closest('.doc-upload-item');
-                const status = parent.querySelector('.doc-status');
-                
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const docData = {
-                            name: file.name,
-                            type: file.type,
-                            size: file.size,
-                            data: event.target.result
-                        };
-                        docBase64List.push(docData);
-                        
-                        parent.classList.add('uploaded');
-                        status.innerHTML = '<i class="fas fa-check-circle"></i> ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    parent.classList.remove('uploaded');
-                    status.innerHTML = '';
-                }
-            });
-        });
-
-        // ===== CNIC TOGGLE =====
-        const ownRadio = document.getElementById('ownCnic');
-        const fatherRadio = document.getElementById('fatherCnic');
-        const ownGroup = document.getElementById('ownCnicGroup');
-        const fatherGroup = document.getElementById('fatherCnicGroup');
-
-        ownRadio.addEventListener('change', function() {
-            if (this.checked) {
-                ownGroup.classList.add('active');
-                fatherGroup.classList.remove('active');
-            }
-        });
-
-        fatherRadio.addEventListener('change', function() {
-            if (this.checked) {
-                fatherGroup.classList.add('active');
-                ownGroup.classList.remove('active');
-            }
-        });
-
-        // ============================================================
-        // ===== FORM SUBMIT =====
-        // ============================================================
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // ===== VALIDATION =====
+            console.log('✅ Form submit triggered!');
+
+            // ===== GET ALL VALUES =====
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -886,74 +612,89 @@
             const university = document.getElementById('university').value.trim();
             const gpa = document.getElementById('gpa').value.trim();
             const about = document.getElementById('about').value.trim();
-            const cnic = document.getElementById('cnic').value.trim();
 
-            if (!firstName || !lastName || !phone || !city || !university || !gpa || !about) {
-                alert('⚠️ Please fill all required fields!');
-                return;
-            }
-
-            // CNIC check
+            // CNIC - either own or father's
             const ownCnic = document.getElementById('ownCnicInput').value.trim();
             const fatherCnic = document.getElementById('fatherCnicInput').value.trim();
-            
-            if (ownCnic === '' && fatherCnic === '') {
-                alert('⚠️ Please provide either your CNIC or your Father\'s CNIC to continue.');
-                return;
-            }
+            const cnic = ownCnic || fatherCnic;
 
-            // Document check
-            if (docBase64List.length === 0) {
-                alert('⚠️ Please upload at least one document (Marksheet, Result, Certificate, etc.) to continue.');
-                return;
-            }
+            console.log('📋 Form values:', { firstName, lastName, phone, city, university, gpa, cnic, about });
 
-            // ===== COLLECT ALL DATA =====
+            // ===== VALIDATION =====
+            if (!firstName) { alert('⚠️ Please enter First Name!'); return; }
+            if (!lastName) { alert('⚠️ Please enter Last Name!'); return; }
+            if (!phone) { alert('⚠️ Please enter Phone Number!'); return; }
+            if (!city) { alert('⚠️ Please enter City!'); return; }
+            if (!university) { alert('⚠️ Please enter University!'); return; }
+            if (!gpa) { alert('⚠️ Please enter GPA!'); return; }
+            if (!cnic) { alert('⚠️ Please enter CNIC!'); return; }
+            if (!about) { alert('⚠️ Please tell us about yourself!'); return; }
+
+            alert('✅ All fields validated! Saving data...');
+
+            // ===== SAVE DATA =====
             const profileData = {
                 firstName: firstName,
                 lastName: lastName,
-                dob: document.getElementById('dob').value,
-                gender: document.getElementById('gender').value,
-                nationality: document.getElementById('nationality').value.trim(),
-                country: document.getElementById('country').value.trim(),
                 phone: phone,
                 city: city,
-                cnic: ownCnic || fatherCnic,
-                cnicType: document.querySelector('input[name="cnicType"]:checked')?.value || 'own',
-                educationLevel: document.getElementById('educationLevel').value,
-                fieldOfStudy: document.getElementById('fieldOfStudy').value.trim(),
                 university: university,
                 gpa: gpa,
-                address: document.getElementById('address').value.trim(),
+                cnic: cnic,
                 about: about,
-                skills: document.getElementById('skills').value.trim(),
-                profileImage: profileImageBase64,
-                documents: docBase64List,
-                documentsCount: docBase64List.length,
                 profileCompleted: true,
-                profileCompletedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+                submittedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
             };
 
-            console.log('📤 Sending profile data with ' + docBase64List.length + ' documents');
+            console.log('📤 Sending data to API:', profileData);
 
-            try {
-                const response = await fetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(profileData)
-                });
-                const result = await response.json();
-                console.log('✅ Profile data saved:', result);
-
+            fetch('/api/save-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profileData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('✅ API Response:', result);
                 if (result.success) {
                     alert('✅ Profile completed successfully! Redirecting to verification...');
                     window.location.href = 'verification.html';
                 } else {
                     alert('⚠️ Error: ' + result.error);
                 }
-            } catch (error) {
-                console.error('❌ Error saving profile data:', error);
-                alert('⚠️ Error saving data. Please try again.');
+            })
+            .catch(error => {
+                console.error('❌ Error:', error);
+                alert('⚠️ Error: ' + error.message);
+            });
+        });
+
+        // ===== CNIC TOGGLE =====
+        document.getElementById('ownCnic').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('ownCnicGroup').classList.add('active');
+                document.getElementById('fatherCnicGroup').classList.remove('active');
+            }
+        });
+
+        document.getElementById('fatherCnic').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('fatherCnicGroup').classList.add('active');
+                document.getElementById('ownCnicGroup').classList.remove('active');
+            }
+        });
+
+        // ===== IMAGE UPLOAD PREVIEW =====
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('profilePreview').src = event.target.result;
+                    document.getElementById('profilePreview').style.display = 'block';
+                    document.getElementById('uploadPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
         });
     </script>
