@@ -537,6 +537,7 @@
         <div class="container">
             <div class="profile-box">
 
+                <!-- Header -->
                 <div class="profile-header">
                     <div class="profile-icon">
                         <i class="fas fa-user-circle"></i>
@@ -545,6 +546,7 @@
                     <p>Provide your details to apply for scholarships</p>
                 </div>
 
+                <!-- Progress Steps -->
                 <div class="progress-steps">
                     <span class="step-dot done"></span>
                     <span class="step-line done"></span>
@@ -555,6 +557,7 @@
                     <span class="step-dot"></span>
                 </div>
 
+                <!-- Profile Form -->
                 <form class="profile-form" id="profileForm">
 
                     <!-- Image Upload -->
@@ -628,7 +631,7 @@
                         </div>
                     </div>
 
-                    <!-- CNIC SECTION -->
+                    <!-- ===== CNIC SECTION ===== -->
                     <div class="form-group full-width">
                         <div class="cnic-section">
                             <div class="cnic-title">
@@ -676,7 +679,7 @@
                         </div>
                     </div>
 
-                    <!-- DOCUMENT UPLOAD SECTION -->
+                    <!-- ===== DOCUMENT UPLOAD SECTION ===== -->
                     <div class="form-group full-width">
                         <div class="document-section">
                             <div class="doc-title">
@@ -690,6 +693,7 @@
 
                             <div class="doc-upload-grid">
 
+                                <!-- Document 1: Marksheet / Transcript -->
                                 <div class="doc-upload-item" id="doc1">
                                     <div class="doc-icon"><i class="fas fa-file-alt"></i></div>
                                     <div class="doc-label">Marksheet / Transcript</div>
@@ -698,6 +702,7 @@
                                     <input type="file" id="docInput1" accept=".pdf,.jpg,.jpeg,.png" />
                                 </div>
 
+                                <!-- Document 2: Result Card -->
                                 <div class="doc-upload-item" id="doc2">
                                     <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
                                     <div class="doc-label">Result Card</div>
@@ -706,6 +711,7 @@
                                     <input type="file" id="docInput2" accept=".pdf,.jpg,.jpeg,.png" />
                                 </div>
 
+                                <!-- Document 3: Certificate / Degree -->
                                 <div class="doc-upload-item" id="doc3">
                                     <div class="doc-icon"><i class="fas fa-certificate"></i></div>
                                     <div class="doc-label">Certificate / Degree</div>
@@ -714,6 +720,7 @@
                                     <input type="file" id="docInput3" accept=".pdf,.jpg,.jpeg,.png" />
                                 </div>
 
+                                <!-- Document 4: Other Documents -->
                                 <div class="doc-upload-item" id="doc4">
                                     <div class="doc-icon"><i class="fas fa-folder-open"></i></div>
                                     <div class="doc-label">Other Documents</div>
@@ -793,6 +800,9 @@
 
     <script src="js/script.js"></script>
 
+    <!-- ============================================================ -->
+    <!-- ===== COMPLETE PROFILE JAVASCRIPT ===== -->
+    <!-- ============================================================ -->
     <script>
         // ===== VARIABLES =====
         let profileImageBase64 = '';
@@ -862,10 +872,28 @@
             }
         });
 
+        // ============================================================
         // ===== FORM SUBMIT =====
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
+        // ============================================================
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // ===== VALIDATION =====
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const university = document.getElementById('university').value.trim();
+            const gpa = document.getElementById('gpa').value.trim();
+            const about = document.getElementById('about').value.trim();
+            const cnic = document.getElementById('cnic').value.trim();
+
+            if (!firstName || !lastName || !phone || !city || !university || !gpa || !about) {
+                alert('⚠️ Please fill all required fields!');
+                return;
+            }
+
+            // CNIC check
             const ownCnic = document.getElementById('ownCnicInput').value.trim();
             const fatherCnic = document.getElementById('fatherCnicInput').value.trim();
             
@@ -874,29 +902,31 @@
                 return;
             }
 
+            // Document check
             if (docBase64List.length === 0) {
                 alert('⚠️ Please upload at least one document (Marksheet, Result, Certificate, etc.) to continue.');
                 return;
             }
 
+            // ===== COLLECT ALL DATA =====
             const profileData = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
+                firstName: firstName,
+                lastName: lastName,
                 dob: document.getElementById('dob').value,
                 gender: document.getElementById('gender').value,
-                nationality: document.getElementById('nationality').value,
-                country: document.getElementById('country').value,
-                phone: document.getElementById('phone').value,
-                city: document.getElementById('city').value,
+                nationality: document.getElementById('nationality').value.trim(),
+                country: document.getElementById('country').value.trim(),
+                phone: phone,
+                city: city,
                 cnic: ownCnic || fatherCnic,
                 cnicType: document.querySelector('input[name="cnicType"]:checked')?.value || 'own',
                 educationLevel: document.getElementById('educationLevel').value,
-                fieldOfStudy: document.getElementById('fieldOfStudy').value,
-                university: document.getElementById('university').value,
-                gpa: document.getElementById('gpa').value,
-                address: document.getElementById('address').value,
-                about: document.getElementById('about').value,
-                skills: document.getElementById('skills').value,
+                fieldOfStudy: document.getElementById('fieldOfStudy').value.trim(),
+                university: university,
+                gpa: gpa,
+                address: document.getElementById('address').value.trim(),
+                about: about,
+                skills: document.getElementById('skills').value.trim(),
                 profileImage: profileImageBase64,
                 documents: docBase64List,
                 documentsCount: docBase64List.length,
@@ -906,19 +936,25 @@
 
             console.log('📤 Sending profile data with ' + docBase64List.length + ' documents');
 
-            // ===== SAVE TO LOCAL STORAGE =====
-            let allUsers = [];
-            const saved = localStorage.getItem('allUsersData');
-            if (saved) {
-                allUsers = JSON.parse(saved);
-            }
-            
-            allUsers.push(profileData);
-            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-            console.log('✅ Profile data saved to Local Storage! Total users:', allUsers.length);
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+                const result = await response.json();
+                console.log('✅ Profile data saved:', result);
 
-            alert('✅ Profile completed successfully! Redirecting to Scholarships...');
-           window.location.href = 'verification.html';
+                if (result.success) {
+                    alert('✅ Profile completed successfully! Redirecting to verification...');
+                    window.location.href = 'verification.html';
+                } else {
+                    alert('⚠️ Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error saving profile data:', error);
+                alert('⚠️ Error saving data. Please try again.');
+            }
         });
     </script>
 
