@@ -58,12 +58,16 @@ app.post('/api/save-user', async (req, res) => {
         await writeUsers(users);
 
         console.log('✅ Data saved! Total:', users.length);
-        res.json({ success: true, totalUsers: users.length });
+        
+        // ===== ALWAYS RETURN JSON =====
+        res.status(200).json({ success: true, totalUsers: users.length });
+        
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
-        res.status(500).json({
-            success: false,
-            error: error.message
+        // ===== ALWAYS RETURN JSON, EVEN ON ERROR =====
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
         });
     }
 });
