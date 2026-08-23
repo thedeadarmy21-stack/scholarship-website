@@ -37,20 +37,28 @@
         .user-card .data-grid .field { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
         .user-card .data-grid .field strong { color: #0a1628; font-weight: 600; }
         .user-card .data-grid .field .value { color: #475569; }
-        .user-card .doc-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-        .user-card .doc-list .doc-tag { background: #f0f4f8; padding: 4px 12px; border-radius: 50px; font-size: 11px; color: #0a1628; display: inline-flex; align-items: center; gap: 4px; }
-        .user-card .doc-list .doc-tag i { color: #2563eb; }
+        .user-card .section-title { font-weight: 600; color: #0a1628; margin-top: 10px; margin-bottom: 4px; font-size: 14px; }
+        .user-card .section-title i { color: #2563eb; margin-right: 6px; }
+        .user-card .about-text { background: #f8fafc; padding: 10px 14px; border-radius: 8px; color: #475569; font-size: 14px; margin-top: 6px; border-left: 3px solid #2563eb; }
         .user-card .image-preview { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid #eef2f6; margin-top: 6px; cursor: pointer; }
         .user-card .image-preview:hover { border-color: #2563eb; transform: scale(1.05); }
-        .user-card .about-text { background: #f8fafc; padding: 10px 14px; border-radius: 8px; color: #475569; font-size: 14px; margin-top: 6px; border-left: 3px solid #2563eb; }
+        
+        /* ===== DOCUMENT GALLERY ===== */
+        .doc-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .doc-gallery .doc-item { background: #f8fafc; border-radius: 10px; padding: 8px; text-align: center; border: 1px solid #eef2f6; width: 120px; transition: all 0.3s ease; }
+        .doc-gallery .doc-item:hover { border-color: #2563eb; transform: scale(1.03); }
+        .doc-gallery .doc-item img { width: 100px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; cursor: pointer; }
+        .doc-gallery .doc-item img:hover { border-color: #2563eb; }
+        .doc-gallery .doc-item .doc-name { font-size: 10px; color: #64748b; margin-top: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+        .doc-gallery .doc-item .doc-icon { font-size: 36px; color: #94a3b8; display: block; padding: 10px; }
+        .doc-gallery .doc-item .doc-size { font-size: 9px; color: #94a3b8; }
+        
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
         .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
-        .section-title { font-weight: 600; color: #0a1628; margin-top: 10px; margin-bottom: 4px; font-size: 14px; }
-        .section-title i { color: #2563eb; margin-right: 6px; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-weight: 600; display: none; z-index: 999; }
         .toast.error { background: #ef4444; }
-        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } }
+        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } .doc-gallery .doc-item { width: 100px; } .doc-gallery .doc-item img { width: 80px; height: 60px; } }
     </style>
 </head>
 <body>
@@ -146,15 +154,36 @@
                         html += '<div class="about-text">' + user.about + '</div>';
                     }
                     
+                    // ===== DOCUMENTS WITH IMAGE PREVIEW =====
                     if (hasDocs) {
                         html += '<div class="section-title"><i class="fas fa-file-upload"></i>Documents Uploaded (' + user.documents.length + ')</div>';
-                        html += '<div class="doc-list">';
+                        html += '<div class="doc-gallery">';
                         user.documents.forEach(doc => {
-                            html += '<span class="doc-tag"><i class="fas fa-file"></i> ' + (doc.name || doc) + '</span>';
+                            // Check if document is an image (has data property)
+                            const isImage = doc.data && doc.data.startsWith('data:image/');
+                            const ext = doc.name ? doc.name.split('.').pop().toLowerCase() : '';
+                            const isImageExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext);
+                            
+                            if (isImage || isImageExt) {
+                                // Show image preview
+                                html += '<div class="doc-item">';
+                                html += '<img src="' + (doc.data || '') + '" alt="' + (doc.name || 'Document') + '" title="' + (doc.name || 'Document') + '" onclick="window.open(this.src)" />';
+                                html += '<span class="doc-name">' + (doc.name || 'Image') + '</span>';
+                                html += '<span class="doc-size">' + (doc.size ? (doc.size / 1024).toFixed(1) + ' KB' : '') + '</span>';
+                                html += '</div>';
+                            } else {
+                                // Show file icon
+                                html += '<div class="doc-item">';
+                                html += '<div class="doc-icon"><i class="fas fa-file-pdf"></i></div>';
+                                html += '<span class="doc-name">' + (doc.name || 'File') + '</span>';
+                                html += '<span class="doc-size">' + (doc.size ? (doc.size / 1024).toFixed(1) + ' KB' : '') + '</span>';
+                                html += '</div>';
+                            }
                         });
                         html += '</div>';
                     }
                     
+                    // ===== PROFILE IMAGE =====
                     if (hasImage) {
                         html += '<div class="section-title"><i class="fas fa-image"></i>Profile Image</div>';
                         html += '<img src="' + user.profileImage + '" class="image-preview" onclick="window.open(this.src)" />';
