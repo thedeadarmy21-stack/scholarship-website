@@ -792,7 +792,7 @@
     <script src="js/script.js"></script>
 
     <!-- ============================================================ -->
-    <!-- ===== COMPLETE PROFILE JAVASCRIPT - FULL VERSION ===== -->
+    <!-- ===== COMPLETE PROFILE JAVASCRIPT - WITH USER ID ===== -->
     <!-- ============================================================ -->
     <script>
         // ============================================================
@@ -865,11 +865,19 @@
         });
 
         // ============================================================
-        //  FORM SUBMIT
+        //  FORM SUBMIT - WITH USER ID
         // ============================================================
         document.getElementById('profileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             console.log('✅ Form submit triggered!');
+
+            // ===== GET USER ID FROM LOCAL STORAGE =====
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('⚠️ Please register first!');
+                window.location.href = 'register.html';
+                return;
+            }
 
             // ===== GET VALUES =====
             const firstName = document.getElementById('firstName').value.trim();
@@ -910,8 +918,9 @@
                 return;
             }
 
-            // ===== COLLECT DATA =====
+            // ===== COLLECT DATA WITH USER ID =====
             const profileData = {
+                id: parseInt(userId),
                 firstName: firstName,
                 lastName: lastName,
                 dob: dob,

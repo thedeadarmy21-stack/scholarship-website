@@ -44,27 +44,35 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// ===== SAVE USER DATA =====
+// ===== SAVE USER DATA - MERGE BY ID =====
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
-        userData.id = Date.now();
 
         console.log('📥 Received data:', userData);
 
         let users = await readUsers();
-        users.push(userData);
-        await writeUsers(users);
-
-        console.log('✅ Data saved! Total:', users.length);
         
-        // ===== ALWAYS RETURN JSON =====
+        // Check if user already exists by ID
+        const existingIndex = users.findIndex(u => u.id === userData.id);
+        
+        if (existingIndex !== -1) {
+            // Merge data with existing user
+            users[existingIndex] = { ...users[existingIndex], ...userData };
+            console.log('✅ User updated:', userData.id);
+        } else {
+            // New user
+            users.push(userData);
+            console.log('✅ New user added:', userData.id);
+        }
+
+        await writeUsers(users);
+        console.log('✅ Data saved! Total:', users.length);
         res.status(200).json({ success: true, totalUsers: users.length });
         
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
-        // ===== ALWAYS RETURN JSON, EVEN ON ERROR =====
         res.status(500).json({ 
             success: false, 
             error: error.message 

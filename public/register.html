@@ -90,13 +90,25 @@
                 return;
             }
 
-            console.log('📤 Sending data:', { name, email, password });
+            // ===== GENERATE UNIQUE USER ID =====
+            const userId = Date.now();
+            localStorage.setItem('userId', userId);
+
+            const userData = {
+                id: userId,
+                name: name,
+                email: email,
+                password: password,
+                submittedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+            };
+
+            console.log('📤 Sending data:', userData);
 
             try {
                 const response = await fetch('/api/save-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify(userData)
                 });
 
                 const result = await response.json();

