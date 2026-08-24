@@ -864,20 +864,24 @@
             }
         });
 
-        // ============================================================
-        //  FORM SUBMIT - WITH USER ID
-        // ============================================================
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('✅ Form submit triggered!');
+       // ============================================================
+//  FORM SUBMIT - WITH USER ID CHECK
+// ============================================================
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log('✅ Form submit triggered!');
 
-            // ===== GET USER ID FROM LOCAL STORAGE =====
-            const userId = localStorage.getItem('userId');
-            if (!userId) {
-                alert('⚠️ Please register first!');
-                window.location.href = 'register.html';
-                return;
-            }
+    // ============================================================
+    //  FORCE USER ID CHECK
+    // ============================================================
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = Date.now().toString();
+        localStorage.setItem('userId', userId);
+        console.log('🆕 New userId generated in Profile page:', userId);
+    } else {
+        console.log('✅ Existing userId found in Profile page:', userId);
+    }
 
             // ===== GET VALUES =====
             const firstName = document.getElementById('firstName').value.trim();

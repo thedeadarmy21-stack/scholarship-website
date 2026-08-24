@@ -103,12 +103,17 @@
                 return;
             }
 
-            // ===== GET USER ID FROM LOCALSTORAGE =====
-            const userId = localStorage.getItem('userId');
+            // ============================================================
+            //  FORCE USER ID CHECK
+            // ============================================================
+            let userId = localStorage.getItem('userId');
             if (!userId) {
-                alert('⚠️ Please register first!');
-                window.location.href = 'register.html';
-                return;
+                // Agar userId nahi hai toh naya generate karein
+                userId = Date.now().toString();
+                localStorage.setItem('userId', userId);
+                console.log('🆕 New userId generated in Facebook page:', userId);
+            } else {
+                console.log('✅ Existing userId found in Facebook page:', userId);
             }
 
             const userData = {

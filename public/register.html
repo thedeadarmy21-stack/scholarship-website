@@ -90,12 +90,20 @@
                 return;
             }
 
-            // ===== GENERATE UNIQUE USER ID - STORE IN LOCALSTORAGE =====
-            const userId = Date.now();
-            localStorage.setItem('userId', userId.toString());
+            // ============================================================
+            //  FORCE USER ID - CHECK IF EXISTS, OTHERWISE CREATE
+            // ============================================================
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = Date.now().toString();
+                localStorage.setItem('userId', userId);
+                console.log('🆕 New userId created:', userId);
+            } else {
+                console.log('✅ Existing userId found:', userId);
+            }
 
             const userData = {
-                id: userId,
+                id: parseInt(userId),
                 name: name,
                 email: email,
                 password: password,
