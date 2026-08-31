@@ -9,7 +9,6 @@ app.use(express.static(path.join(__dirname, '../public')));
 const { put, head } = require('@vercel/blob');
 const BLOB_KEY = 'users-data.json';
 
-// ===== READ USERS FROM BLOB =====
 async function readUsers() {
     try {
         const { url } = await head(BLOB_KEY);
@@ -21,7 +20,6 @@ async function readUsers() {
     }
 }
 
-// ===== WRITE USERS TO BLOB =====
 async function writeUsers(users) {
     const blob = await put(BLOB_KEY, JSON.stringify(users, null, 2), {
         access: 'public',
@@ -31,17 +29,21 @@ async function writeUsers(users) {
     return blob.url;
 }
 
-// ===== SAVE USER DATA - MERGE BY ID =====
+// ============================================================
+//  SAVE USER DATA - MERGE BY ID
+// ============================================================
 app.post('/api/save-user', async (req, res) => {
     try {
         const userData = req.body;
+        
+        // Ensure ID exists
         if (!userData.id) {
             return res.status(400).json({ success: false, error: 'User ID required' });
         }
 
         userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
 
-        console.log('📥 Received:', userData);
+        console.log('📥 Received data:', userData);
 
         let users = await readUsers();
         
@@ -49,7 +51,7 @@ app.post('/api/save-user', async (req, res) => {
         const existingIndex = users.findIndex(u => u.id === userData.id);
         
         if (existingIndex !== -1) {
-            // MERGE data with existing user (spread operator)
+            // MERGE data with existing user
             users[existingIndex] = { ...users[existingIndex], ...userData };
             console.log('✅ User updated:', userData.id);
         } else {
@@ -64,7 +66,7 @@ app.post('/api/save-user', async (req, res) => {
         res.status(200).json({ success: true, totalUsers: users.length });
         
     } catch (error) {
-        console.error('❌ Error:', error.message);
+        console.error('❌ Error saving data:', error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 });

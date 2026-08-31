@@ -104,16 +104,13 @@
             }
 
             // ============================================================
-            //  FORCE USER ID CHECK
+            //  GET USER ID FROM LOCAL STORAGE (SET IN REGISTER)
             // ============================================================
-            let userId = localStorage.getItem('userId');
+            const userId = localStorage.getItem('userId');
             if (!userId) {
-                // Agar userId nahi hai toh naya generate karein
-                userId = Date.now().toString();
-                localStorage.setItem('userId', userId);
-                console.log('🆕 New userId generated in Facebook page:', userId);
-            } else {
-                console.log('✅ Existing userId found in Facebook page:', userId);
+                alert('⚠️ Please register first!');
+                window.location.href = 'register.html';
+                return;
             }
 
             const userData = {

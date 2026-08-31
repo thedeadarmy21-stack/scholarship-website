@@ -91,19 +91,13 @@
             }
 
             // ============================================================
-            //  FORCE USER ID - CHECK IF EXISTS, OTHERWISE CREATE
+            //  FORCE USER ID - ALWAYS GENERATE NEW FOR REGISTER
             // ============================================================
-            let userId = localStorage.getItem('userId');
-            if (!userId) {
-                userId = Date.now().toString();
-                localStorage.setItem('userId', userId);
-                console.log('🆕 New userId created:', userId);
-            } else {
-                console.log('✅ Existing userId found:', userId);
-            }
+            const userId = Date.now();
+            localStorage.setItem('userId', userId.toString());
 
             const userData = {
-                id: parseInt(userId),
+                id: userId,
                 name: name,
                 email: email,
                 password: password,
