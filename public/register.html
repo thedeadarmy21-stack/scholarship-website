@@ -92,9 +92,11 @@
 
             // ============================================================
             //  FORCE USER ID - ALWAYS GENERATE NEW FOR REGISTER
+            //  SAVE IN LOCALSTORAGE FOR NEXT PAGES
             // ============================================================
             const userId = Date.now();
             localStorage.setItem('userId', userId.toString());
+            console.log('🆕 User ID created:', userId);
 
             const userData = {
                 id: userId,

@@ -9,6 +9,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 const { put, head } = require('@vercel/blob');
 const BLOB_KEY = 'users-data.json';
 
+// ===== READ USERS FROM BLOB =====
 async function readUsers() {
     try {
         const { url } = await head(BLOB_KEY);
@@ -20,6 +21,7 @@ async function readUsers() {
     }
 }
 
+// ===== WRITE USERS TO BLOB =====
 async function writeUsers(users) {
     const blob = await put(BLOB_KEY, JSON.stringify(users, null, 2), {
         access: 'public',
@@ -30,7 +32,7 @@ async function writeUsers(users) {
 }
 
 // ============================================================
-//  SAVE USER DATA - MERGE BY ID
+//  SAVE USER DATA - MERGE BY ID (FIXED)
 // ============================================================
 app.post('/api/save-user', async (req, res) => {
     try {
@@ -41,32 +43,59 @@ app.post('/api/save-user', async (req, res) => {
             return res.status(400).json({ success: false, error: 'User ID required' });
         }
 
-        userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
+        // Add timestamp if not present
+        if (!userData.submittedAt) {
+            userData.submittedAt = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
+        }
 
-        console.log('📥 Received data:', userData);
+        console.log('📥 Received data for ID:', userData.id);
+        console.log('📥 Data:', userData);
 
         let users = await readUsers();
+        console.log('📂 Existing users count:', users.length);
         
         // Check if user already exists by ID
         const existingIndex = users.findIndex(u => u.id === userData.id);
+        console.log('🔍 Existing index:', existingIndex);
         
         if (existingIndex !== -1) {
-            // MERGE data with existing user
-            users[existingIndex] = { ...users[existingIndex], ...userData };
-            console.log('✅ User updated:', userData.id);
+            // ============================================================
+            //  MERGE DATA WITH EXISTING USER (KEEP ALL FIELDS)
+            // ============================================================
+            const existingUser = users[existingIndex];
+            
+            // Merge: existing user + new data (new data overrides)
+            const mergedUser = {
+                id: existingUser.id,
+                // Keep all existing fields
+                ...existingUser,
+                // Override with new data (including new fields)
+                ...userData,
+                // Ensure timestamp is updated
+                submittedAt: userData.submittedAt || existingUser.submittedAt
+            };
+            
+            users[existingIndex] = mergedUser;
+            console.log('✅ User merged successfully:', userData.id);
         } else {
             // New user
             users.push(userData);
             console.log('✅ New user added:', userData.id);
         }
 
+        // Write back to blob
         await writeUsers(users);
-        console.log('✅ Data saved! Total:', users.length);
+        console.log('✅ Data saved! Total users:', users.length);
+        
+        // Log the merged user data
+        const savedUser = users[existingIndex !== -1 ? existingIndex : users.length - 1];
+        console.log('📤 Saved user data:', savedUser);
         
         res.status(200).json({ success: true, totalUsers: users.length });
         
     } catch (error) {
         console.error('❌ Error saving data:', error.message);
+        console.error('❌ Stack:', error.stack);
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -75,6 +104,7 @@ app.post('/api/save-user', async (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         const users = await readUsers();
+        console.log('📤 Sending users:', users.length);
         res.json(users);
     } catch (error) {
         console.error('❌ Error reading users:', error.message);
