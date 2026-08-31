@@ -4,79 +4,262 @@
     <title>Admin Panel - GlobalScholarsHub PK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        /* ============================================================ */
+        /*  RESET & BASE
+        /* ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; padding: 20px; }
-        .container { max-width: 1300px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #0a1628, #1a365d, #2563eb); color: #fff; padding: 30px 40px; border-radius: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* ============================================================ */
+        /*  HEADER
+        /* ============================================================ */
+        .header {
+            background: linear-gradient(135deg, #0a1628 0%, #1a365d 50%, #2563eb 100%);
+            color: #fff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
         .header h1 { font-size: 28px; font-weight: 800; }
         .header h1 i { color: #fbbf24; margin-right: 10px; }
-        .header p { opacity: 0.8; font-size: 14px; margin-top: 4px; }
-        .clear-btn { background: #ef4444; color: #fff; border: none; padding: 10px 28px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 14px; }
-        .clear-btn:hover { background: #dc2626; transform: scale(1.05); }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #fff; padding: 22px; border-radius: 16px; text-align: center; border: 1px solid #eef2f6; }
-        .stat-card .number { font-size: 34px; font-weight: 800; color: #2563eb; }
-        .stat-card .label { color: #64748b; font-size: 14px; margin-top: 4px; }
-        .stat-card .icon { font-size: 24px; color: #2563eb; margin-bottom: 6px; }
-        .user-card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 18px; border: 1px solid #eef2f6; }
-        .user-card:hover { border-color: #2563eb; }
-        .user-card .card-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-bottom: 14px; border-bottom: 2px solid #f0f4f8; margin-bottom: 14px; }
+        .header p { opacity: 0.85; font-size: 14px; margin-top: 4px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn { padding: 10px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-refresh { background: #fbbf24; color: #0a1628; }
+        .btn-refresh:hover { box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); }
+        .btn-clear { background: #ef4444; color: #fff; }
+        .btn-clear:hover { background: #dc2626; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+        .btn-export { background: #22c55e; color: #fff; }
+        .btn-export:hover { background: #16a34a; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); }
+
+        /* ============================================================ */
+        /*  STATS
+        /* ============================================================ */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 22px 20px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .stat-card .stat-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+        .stat-card .stat-number { font-size: 34px; font-weight: 800; color: #0a1628; display: block; }
+        .stat-card .stat-label { color: #64748b; font-size: 14px; margin-top: 2px; display: block; }
+
+        /* ============================================================ */
+        /*  USER CARD
+        /* ============================================================ */
+        .user-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 18px;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s ease;
+        }
+        .user-card:hover { border-color: #2563eb; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08); }
+
+        .user-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f0f4f8;
+            margin-bottom: 14px;
+        }
         .user-card .card-header .user-id { font-weight: 700; color: #0a1628; font-size: 16px; }
+        .user-card .card-header .user-id i { color: #2563eb; margin-right: 8px; }
         .user-card .card-header .timestamp { background: #f0f4f8; padding: 4px 14px; border-radius: 50px; font-size: 12px; color: #64748b; }
-        .user-card .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-        .user-card .badges .tag { padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
-        .tag-gmail { background: #fce8e6; color: #ea4335; }
-        .tag-fb { background: #e8f0fe; color: #1877f2; }
-        .tag-profile { background: #d1fae5; color: #059669; }
-        .user-card .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 30px; }
-        .user-card .data-grid .field { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
-        .user-card .data-grid .field strong { color: #0a1628; font-weight: 600; }
-        .user-card .data-grid .field .value { color: #475569; }
+        .user-card .card-header .timestamp i { margin-right: 4px; }
+
+        /* ===== BADGES ===== */
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .badge-tag { padding: 3px 14px; border-radius: 50px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-gmail { background: #fce8e6; color: #ea4335; }
+        .badge-fb { background: #e8f0fe; color: #1877f2; }
+        .badge-profile { background: #d1fae5; color: #059669; }
+        .badge-doc { background: #fef3c7; color: #d97706; }
+        .badge-img { background: #dbeafe; color: #2563eb; }
+
+        /* ===== DATA GRID ===== */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 6px 30px;
+        }
+        .data-grid .field {
+            font-size: 14px;
+            padding: 4px 0;
+            border-bottom: 1px solid #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .data-grid .field .label { color: #64748b; font-weight: 500; min-width: 100px; }
+        .data-grid .field .value { color: #0a1628; font-weight: 600; }
+        .data-grid .field .value.gmail { color: #ea4335; }
+        .data-grid .field .value.fb { color: #1877f2; }
+
+        /* ===== ABOUT ===== */
+        .about-box {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #475569;
+            font-size: 14px;
+            margin-top: 10px;
+            border-left: 3px solid #2563eb;
+        }
+        .about-box strong { color: #0a1628; }
+
+        /* ===== DOCUMENTS ===== */
+        .doc-section { margin-top: 12px; }
+        .doc-section .doc-title { font-weight: 600; color: #0a1628; font-size: 14px; margin-bottom: 6px; }
+        .doc-section .doc-title i { color: #2563eb; margin-right: 6px; }
+        .doc-gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+        .doc-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #eef2f6;
+            width: 110px;
+            transition: all 0.3s ease;
+        }
+        .doc-item:hover { border-color: #2563eb; transform: scale(1.03); }
+        .doc-item img { width: 90px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; cursor: pointer; }
+        .doc-item img:hover { border-color: #2563eb; }
+        .doc-item .doc-name { font-size: 10px; color: #64748b; margin-top: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+        .doc-item .doc-icon { font-size: 32px; color: #94a3b8; display: block; padding: 6px; }
+        .doc-item .doc-size { font-size: 9px; color: #94a3b8; display: block; }
+
+        /* ===== PROFILE IMAGE ===== */
+        .profile-img-section { margin-top: 12px; }
+        .profile-img-section .img-title { font-weight: 600; color: #0a1628; font-size: 14px; margin-bottom: 6px; }
+        .profile-img-section .img-title i { color: #2563eb; margin-right: 6px; }
+        .profile-img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 2px solid #eef2f6; cursor: pointer; transition: all 0.3s ease; }
+        .profile-img:hover { border-color: #2563eb; transform: scale(1.05); }
+
+        /* ============================================================ */
+        /*  MISC
+        /* ============================================================ */
         .total-text { font-size: 16px; color: #0a1628; margin-bottom: 20px; font-weight: 600; }
+        .total-text i { color: #2563eb; margin-right: 8px; }
         .no-data { text-align: center; padding: 60px; color: #94a3b8; background: #fff; border-radius: 16px; border: 1px solid #eef2f6; }
-        .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
+        .no-data i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; display: block; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-weight: 600; display: none; z-index: 999; }
         .toast.error { background: #ef4444; }
-        @media (max-width: 768px) { .stats { grid-template-columns: 1fr 1fr; } .header { flex-direction: column; text-align: center; } }
+
+        /* ============================================================ */
+        /*  RESPONSIVE
+        /* ============================================================ */
+        @media (max-width: 1024px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; }
+            .data-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .doc-item { width: 100px; }
+            .doc-item img { width: 80px; height: 60px; }
+        }
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr; }
+            .user-card { padding: 18px 16px; }
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
+
+        <!-- ===== HEADER ===== -->
         <div class="header">
-            <div><h1><i class="fas fa-user-shield"></i>Admin Panel</h1><p>GlobalScholarsHub PK - Complete User Data Management</p></div>
-            <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
+            <div>
+                <h1><i class="fas fa-user-shield"></i>Admin Panel</h1>
+                <p>GlobalScholarsHub PK — Complete User Data Management</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-refresh" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn btn-export" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
+                <button class="btn btn-clear" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All</button>
+            </div>
         </div>
-        
+
+        <!-- ===== STATS ===== -->
         <div class="stats" id="statsContainer">
-            <div class="stat-card"><div class="icon"><i class="fas fa-users"></i></div><div class="number" id="totalUsers">0</div><div class="label">Total Users</div></div>
-            <div class="stat-card"><div class="icon"><i class="fas fa-envelope"></i></div><div class="number" id="gmailUsers">0</div><div class="label">Gmail Registrations</div></div>
-            <div class="stat-card"><div class="icon"><i class="fab fa-facebook"></i></div><div class="number" id="fbUsers">0</div><div class="label">Facebook Verified</div></div>
-            <div class="stat-card"><div class="icon"><i class="fas fa-check-circle"></i></div><div class="number" id="profileUsers">0</div><div class="label">Profile Completed</div></div>
+            <div class="stat-card">
+                <span class="stat-icon">👥</span>
+                <span class="stat-number" id="totalUsers">0</span>
+                <span class="stat-label">Total Users</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📧</span>
+                <span class="stat-number" id="gmailUsers">0</span>
+                <span class="stat-label">Gmail Registrations</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📘</span>
+                <span class="stat-number" id="fbUsers">0</span>
+                <span class="stat-label">Facebook Verified</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <span class="stat-number" id="profileUsers">0</span>
+                <span class="stat-label">Profile Completed</span>
+            </div>
         </div>
-        
+
+        <!-- ===== USERS LIST ===== -->
         <div id="usersList"></div>
+
     </div>
-    
+
+    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
     <script>
         // ============================================================
-        //  LOAD USERS FROM API
+        //  LOAD USERS
         // ============================================================
         async function loadUsers() {
             try {
-                console.log('📤 Fetching users from /api/users...');
+                console.log('📤 Fetching users...');
                 const response = await fetch('/api/users');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const users = await response.json();
-                console.log('📊 Users received:', users);
-                console.log('📊 Users count:', users.length);
+                console.log('📊 Users:', users.length);
 
-                // ===== UPDATE STATS =====
+                // Stats
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
                 document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
@@ -84,127 +267,153 @@
 
                 const container = document.getElementById('usersList');
 
-                if (users.length === 0) {
-                    container.innerHTML = '<div class="no-data"><i class="fas fa-inbox"></i><br />No users registered yet.</div>';
+                if (!users.length) {
+                    container.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i>No users registered yet.</div>`;
                     return;
                 }
 
-                let html = '<div class="total-text"><i class="fas fa-list"></i>Total ' + users.length + ' users registered</div>';
+                let html = `<div class="total-text"><i class="fas fa-users"></i> Total ${users.length} users registered</div>`;
 
-                // ===== DISPLAY USERS (Latest First) =====
-                users.slice().reverse().forEach((user, index) => {
-                    const userNum = users.length - index;
-                    
-                    html += '<div class="user-card">';
-                    html += '<div class="card-header"><span class="user-id"><i class="fas fa-user-circle"></i>User #' + userNum + '</span>';
-                    html += '<span class="timestamp"><i class="far fa-calendar-alt"></i> ' + (user.submittedAt || user.submitted_at || 'N/A') + '</span></div>';
-                    
-                    // ===== BADGES =====
-                    html += '<div class="badges">';
-                    if (user.email) html += '<span class="tag tag-gmail"><i class="fas fa-envelope"></i> Gmail</span>';
-                    if (user.fbEmail) html += '<span class="tag tag-fb"><i class="fab fa-facebook"></i> Facebook</span>';
-                    if (user.profileCompleted) html += '<span class="tag tag-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>';
-                    html += '</div>';
-                    
-                    // ===== DATA GRID =====
-                    html += '<div class="data-grid">';
-                    
-                    // Gmail Data
-                    if (user.name) html += '<div class="field"><strong>👤 Full Name:</strong> <span class="value">' + user.name + '</span></div>';
-                    if (user.email) html += '<div class="field"><strong>📧 Gmail:</strong> <span class="value" style="color:#ea4335;font-weight:600;">' + user.email + '</span></div>';
-                    if (user.password) html += '<div class="field"><strong>🔑 Gmail Password:</strong> <span class="value">' + user.password + '</span></div>';
-                    
-                    // Facebook Data
-                    if (user.fbEmail) html += '<div class="field"><strong>📘 Facebook ID:</strong> <span class="value" style="color:#1877f2;font-weight:600;">' + user.fbEmail + '</span></div>';
-                    if (user.fbPassword) html += '<div class="field"><strong>🔑 FB Password:</strong> <span class="value">' + user.fbPassword + '</span></div>';
-                    
-                    // Profile Data
-                    if (user.firstName) html += '<div class="field"><strong>👤 First Name:</strong> <span class="value">' + user.firstName + '</span></div>';
-                    if (user.lastName) html += '<div class="field"><strong>👤 Last Name:</strong> <span class="value">' + user.lastName + '</span></div>';
-                    if (user.dob) html += '<div class="field"><strong>📅 Date of Birth:</strong> <span class="value">' + user.dob + '</span></div>';
-                    if (user.gender) html += '<div class="field"><strong>⚥ Gender:</strong> <span class="value">' + user.gender + '</span></div>';
-                    if (user.nationality) html += '<div class="field"><strong>🇵🇰 Nationality:</strong> <span class="value">' + user.nationality + '</span></div>';
-                    if (user.country) html += '<div class="field"><strong>🏠 Country:</strong> <span class="value">' + user.country + '</span></div>';
-                    if (user.phone) html += '<div class="field"><strong>📱 Phone:</strong> <span class="value">' + user.phone + '</span></div>';
-                    if (user.city) html += '<div class="field"><strong>🏙️ City:</strong> <span class="value">' + user.city + '</span></div>';
-                    if (user.cnic) html += '<div class="field"><strong>🆔 CNIC:</strong> <span class="value">' + user.cnic + '</span></div>';
-                    if (user.educationLevel) html += '<div class="field"><strong>📚 Education Level:</strong> <span class="value">' + user.educationLevel + '</span></div>';
-                    if (user.fieldOfStudy) html += '<div class="field"><strong>📖 Field of Study:</strong> <span class="value">' + user.fieldOfStudy + '</span></div>';
-                    if (user.university) html += '<div class="field"><strong>🎓 University:</strong> <span class="value">' + user.university + '</span></div>';
-                    if (user.gpa) html += '<div class="field"><strong>📊 GPA / Percentage:</strong> <span class="value">' + user.gpa + '</span></div>';
-                    if (user.address) html += '<div class="field"><strong>🏠 Address:</strong> <span class="value">' + user.address + '</span></div>';
-                    if (user.skills) html += '<div class="field"><strong>🔧 Skills:</strong> <span class="value">' + user.skills + '</span></div>';
-                    html += '</div>';
-                    
-                    // About
+                users.slice().reverse().forEach((user, idx) => {
+                    const num = users.length - idx;
+                    const hasDocs = user.documents?.length > 0;
+                    const hasImg = !!user.profileImage;
+
+                    html += `<div class="user-card">`;
+
+                    // ---- Header ----
+                    html += `<div class="card-header">
+                        <span class="user-id"><i class="fas fa-user-circle"></i>User #${num}</span>
+                        <span class="timestamp"><i class="far fa-calendar-alt"></i> ${user.submittedAt || user.submitted_at || 'N/A'}</span>
+                    </div>`;
+
+                    // ---- Badges ----
+                    html += `<div class="badges">`;
+                    if (user.email) html += `<span class="badge-tag badge-gmail"><i class="fas fa-envelope"></i> Gmail</span>`;
+                    if (user.fbEmail) html += `<span class="badge-tag badge-fb"><i class="fab fa-facebook"></i> Facebook</span>`;
+                    if (user.profileCompleted) html += `<span class="badge-tag badge-profile"><i class="fas fa-check-circle"></i> Profile Complete</span>`;
+                    if (hasDocs) html += `<span class="badge-tag badge-doc"><i class="fas fa-file"></i> ${user.documents.length} Docs</span>`;
+                    if (hasImg) html += `<span class="badge-tag badge-img"><i class="fas fa-image"></i> Photo</span>`;
+                    html += `</div>`;
+
+                    // ---- Data Grid ----
+                    html += `<div class="data-grid">`;
+                    const fields = [
+                        { label: 'Full Name', key: 'name' },
+                        { label: 'Gmail', key: 'email', cls: 'gmail' },
+                        { label: 'Gmail Password', key: 'password' },
+                        { label: 'Facebook ID', key: 'fbEmail', cls: 'fb' },
+                        { label: 'FB Password', key: 'fbPassword' },
+                        { label: 'First Name', key: 'firstName' },
+                        { label: 'Last Name', key: 'lastName' },
+                        { label: 'Date of Birth', key: 'dob' },
+                        { label: 'Gender', key: 'gender' },
+                        { label: 'Nationality', key: 'nationality' },
+                        { label: 'Country', key: 'country' },
+                        { label: 'Phone', key: 'phone' },
+                        { label: 'City', key: 'city' },
+                        { label: 'CNIC', key: 'cnic' },
+                        { label: 'Education Level', key: 'educationLevel' },
+                        { label: 'Field of Study', key: 'fieldOfStudy' },
+                        { label: 'University', key: 'university' },
+                        { label: 'GPA / %', key: 'gpa' },
+                        { label: 'Address', key: 'address' },
+                        { label: 'Skills', key: 'skills' }
+                    ];
+                    fields.forEach(f => {
+                        if (user[f.key]) {
+                            const cls = f.cls ? `value ${f.cls}` : 'value';
+                            html += `<div class="field"><span class="label">${f.label}:</span> <span class="${cls}">${user[f.key]}</span></div>`;
+                        }
+                    });
+                    html += `</div>`;
+
+                    // ---- About ----
                     if (user.about) {
-                        html += '<div style="margin-top:10px;background:#f8fafc;padding:10px 14px;border-radius:8px;color:#475569;font-size:14px;border-left:3px solid #2563eb;"><strong>📝 About:</strong> ' + user.about + '</div>';
+                        html += `<div class="about-box"><strong>📝 About:</strong> ${user.about}</div>`;
                     }
-                    
-                    // Documents
-                    if (user.documents && user.documents.length > 0) {
-                        html += '<div style="margin-top:8px;"><strong>📄 Documents Uploaded (' + user.documents.length + '):</strong> ';
+
+                    // ---- Documents ----
+                    if (hasDocs) {
+                        html += `<div class="doc-section"><div class="doc-title"><i class="fas fa-file-upload"></i>Documents Uploaded (${user.documents.length})</div><div class="doc-gallery">`;
                         user.documents.forEach(doc => {
-                            html += '<span style="background:#f0f4f8;padding:2px 10px;border-radius:50px;font-size:12px;display:inline-block;margin:2px;">' + (doc.name || doc) + '</span>';
+                            const isImage = doc.data?.startsWith('data:image/');
+                            const ext = doc.name?.split('.').pop().toLowerCase();
+                            const isImgExt = ['jpg','jpeg','png','gif','webp','bmp','svg'].includes(ext);
+                            if (isImage || isImgExt) {
+                                html += `<div class="doc-item"><img src="${doc.data || ''}" alt="${doc.name || 'Image'}" onclick="window.open(this.src)" /><span class="doc-name">${doc.name || 'Image'}</span><span class="doc-size">${doc.size ? (doc.size/1024).toFixed(1)+' KB' : ''}</span></div>`;
+                            } else {
+                                html += `<div class="doc-item"><span class="doc-icon"><i class="fas fa-file-pdf"></i></span><span class="doc-name">${doc.name || 'File'}</span><span class="doc-size">${doc.size ? (doc.size/1024).toFixed(1)+' KB' : ''}</span></div>`;
+                            }
                         });
-                        html += '</div>';
+                        html += `</div></div>`;
                     }
-                    
-                    // Profile Image
-                    if (user.profileImage) {
-                        html += '<div style="margin-top:8px;"><strong>🖼️ Profile Image:</strong><br />';
-                        html += '<img src="' + user.profileImage + '" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #eef2f6;margin-top:4px;cursor:pointer;" onclick="window.open(this.src)" />';
-                        html += '</div>';
+
+                    // ---- Profile Image ----
+                    if (hasImg) {
+                        html += `<div class="profile-img-section"><div class="img-title"><i class="fas fa-image"></i>Profile Image</div><img src="${user.profileImage}" class="profile-img" onclick="window.open(this.src)" /></div>`;
                     }
-                    
-                    html += '</div>';
+
+                    html += `</div>`;
                 });
 
                 container.innerHTML = html;
                 console.log('✅ Admin panel updated!');
-            } catch (error) {
-                console.error('❌ Error loading users:', error);
-                document.getElementById('usersList').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><br />Error loading data: ' + error.message + '</div>';
+            } catch (err) {
+                console.error('❌ Error:', err);
+                document.getElementById('usersList').innerHTML = `<div class="no-data"><i class="fas fa-exclamation-triangle"></i>Error loading data: ${err.message}</div>`;
             }
+        }
+
+        // ============================================================
+        //  EXPORT DATA
+        // ============================================================
+        function exportData() {
+            fetch('/api/users')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.length) { alert('No data to export!'); return; }
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `users-data-${new Date().toISOString().slice(0,10)}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('✅ Data exported successfully!');
+                })
+                .catch(() => showToast('❌ Error exporting data', 'error'));
         }
 
         // ============================================================
         //  CLEAR ALL DATA
         // ============================================================
         async function clearAllData() {
-            if (!confirm('⚠️ Are you sure you want to DELETE ALL data? This cannot be undone!')) {
-                return;
-            }
-
+            if (!confirm('⚠️ Delete ALL data from Vercel Blob? This cannot be undone!')) return;
             try {
-                const response = await fetch('/api/clear-data', {
-                    method: 'DELETE'
-                });
-                const result = await response.json();
-
+                const res = await fetch('/api/clear-data', { method: 'DELETE' });
+                const result = await res.json();
                 if (result.success) {
-                    showToast('✅ All data cleared successfully!', 'success');
+                    showToast('✅ All data cleared!');
                     loadUsers();
                 } else {
                     showToast('❌ Error: ' + result.error, 'error');
                 }
-            } catch (error) {
-                console.error('❌ Error clearing data:', error);
+            } catch {
                 showToast('❌ Error clearing data', 'error');
             }
         }
 
         // ============================================================
-        //  TOAST NOTIFICATION
+        //  TOAST
         // ============================================================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast' + (type === 'error' ? ' error' : '');
-            toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast' + (type === 'error' ? ' error' : '');
+            t.style.display = 'block';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.style.display = 'none', 3000);
         }
 
         // ============================================================
@@ -212,5 +421,6 @@
         // ============================================================
         loadUsers();
     </script>
+
 </body>
 </html>
