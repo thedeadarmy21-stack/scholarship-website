@@ -261,7 +261,8 @@
 
                 // Stats
                 document.getElementById('totalUsers').textContent = users.length;
-                document.getElementById('gmailUsers').textContent = users.filter(u => u.email).length;
+                const gmailCount = users.filter(u => u.email && u.email.trim() !== '').length;
+document.getElementById('gmailUsers').textContent = gmailCount;
                 document.getElementById('fbUsers').textContent = users.filter(u => u.fbEmail).length;
                 document.getElementById('profileUsers').textContent = users.filter(u => u.profileCompleted).length;
 
